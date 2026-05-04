@@ -1,0 +1,37 @@
+{% extends "models/base.twig" %}
+{% block pageName %}Login{% endblock %}
+
+{% block headerGoodies %}
+<link rel="stylesheet" href="/assets/authpages.css">
+{% endblock %}
+
+{% block body %}
+<div class="div-center center">
+    <div class="item-group">
+        <div class="item-container">
+            <div style="display: flex;  flex-direction: column;" class="verticalLine">
+                <div id="loginthing" >
+                    <h1 style="margin-bottom: 0.25rem;">Login</h1>
+                    <p>
+                        <b>the watr files</b>
+                        <br>
+                        so basically like you <br>
+                        know when like the centipedes
+                        <br>🐛
+                        <br><br>
+                        <i><b>- sword 2026</b></i>
+                    </p>
+                </div>
+            </div>
+            </div>
+            <div id="loginForm">
+                <form>
+                    <input type="username" name="username" placeholder="username"><br>
+                    <input type="password" name="password" placeholder="password"><br><br>
+                    <a id="error-button" class="button" href="#">Login</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
