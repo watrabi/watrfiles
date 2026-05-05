@@ -22,7 +22,7 @@ final class UserAuthentication extends AbstractMigration
     {
         $users = $this->table('users');
         $users->addColumn('username', 'string', ['limit' => 20])
-              ->addColumn('password', 'string', ['limit' => 40])
+              ->addColumn('password', 'string', ['limit' => 255])
               ->addColumn('created', 'biginteger')
               ->addColumn('updated', 'biginteger', ['null' => true])
               ->addIndex(['username'], ['unique' => true])

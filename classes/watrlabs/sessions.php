@@ -14,7 +14,7 @@ class sessions {
         $encrpytion = new encryption();
         $cookies = new cookies();
 
-        $sessionId = $encrypt->genRandString(100); // server go boom
+        $sessionId = $encrpytion->genRandString(100); // server go boom
 
         $insert = [
             "sessionId"=>$sessionId,

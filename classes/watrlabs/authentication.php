@@ -51,7 +51,7 @@ class authentication {
             return ["status"=>"error", "message"=>"Username is too long."];
         }
 
-        if (trim($str) && str_contains($str, ' ') == false) {
+        if (trim($username) && str_contains($username, ' ') == true) {
             return ["status"=>"error", "message"=>"Username cannot have spaces at the beginning or end."];
         }
 

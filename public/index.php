@@ -60,6 +60,7 @@ function handle_error($e){
         file_put_contents("../storage/errorlog.log", $e . "\n\n", FILE_APPEND);
         http_response_code(500);
         global $twig;
+        echo $e;
         echo $twig->render('status_codes/500.twig');
     } catch(ErrorException $e){
         $log->internal_log($e, "Site Error!");

@@ -1,17 +1,18 @@
 {% extends "models/base.twig" %}
-{% block pageName %}Register{% endblock %}
+{% block pageName %}Login{% endblock %}
 
 {% block headerGoodies %}
 <link rel="stylesheet" href="/assets/authpages.css">
 {% endblock %}
 
 {% block body %}
+
 <div class="div-center center">
     <div class="item-group">
         <div class="item-container">
             <div style="display: flex;  flex-direction: column;" class="verticalLine">
                 <div id="loginthing" >
-                    <h1 style="margin-bottom: 0.25rem;">Login</h1>
+                    <h1 style="margin-bottom: 0.25rem;">Register</h1>
                     <p>
                         <b>the watr files</b>
                         <br>
@@ -25,14 +26,63 @@
             </div>
             </div>
             <div id="loginForm">
+                <div id="error-area">
+                    <div style="display: none;" class="danger" id="dangermsg">
+                        An error occured
+                    </div>
+                </div>
+                <br>
                 <form>
-                    <input type="username" name="username" placeholder="username"><br>
-                    <input type="password" name="password" placeholder="password"><br>
-                    <input type="password" name="passwordconf" placeholder="confirm password"><br><br>
-                    <a id="error-button" class="button" href="#">Login</a>
+                    <input type="username" name="username" placeholder="username" id="username"><br>
+                    <input type="password" name="password" placeholder="password" id="password"><br><br>
+                    <input type="password" name="passwordconf" placeholder="password" id="passwordconf"><br><br>
+                    <a id="error-button" class="button" href="#" onclick="register()" id="loginButton">Register</a>
                 </form>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    let usernameInput = $("#username");
+    let passwordInput = $("#password");
+    let passwordValInput = $("#passwordconf");
+    let submitBtn = $("#loginButton");
+    let errorMsg = $("#dangermsg");
+
+    function register() {
+
+        errorMsg.css("display", "none");
+
+        password = passwordInput.val();
+        passwordConf = passwordValInput.val();
+
+        if(password != passwordConf){
+            errorMsg.text("Your passwords do not match.");
+            errorMsg.css("display", "block");
+            return;
+        }
+
+        $.post("/api/v1/auth/register", {
+            username: usernameInput.val(),
+            password: passwordInput.val()
+        }).fail(onError).done(didHappen);
+    }
+
+    function didHappen(data){
+        if(data.status == "Okay"){
+            errorMsg.css("display", "none");
+            window.location.href = "/home";
+        } else {
+            errorMsg.text(data.message);
+            errorMsg.css("display", "block");
+        }
+    }
+
+    function onError() {
+        errorMsg.text("An error occured.");
+        errorMsg.css("display", "block");
+    }
+</script>
+
 {% endblock %}
