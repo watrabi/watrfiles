@@ -1,6 +1,9 @@
 <?php
 use Pixie\Connection;
 use Pixie\QueryBuilder\QueryBuilderHandler;
+use watrlabs\authentication;
+
+global $currentuser;
 global $dotenv;
 global $db;
 global $twig;
@@ -50,7 +53,12 @@ $twig = new \Twig\Environment($loader, [
     'cache' => '../storage/cache',
     'auto_reload' => true
 ]);
+
 $twig->addFunction(new \Twig\TwigFunction('env', function ($key) {
     return $_ENV[$key];
 }));
 
+$auth = new authentication();
+$currentuser = $auth->getUserInfo();
+
+$twig->addGlobal("currentuser", $currentuser);

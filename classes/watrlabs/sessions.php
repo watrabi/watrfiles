@@ -37,8 +37,12 @@ class sessions {
     public function getCurrentSession(){
 
         global $db;
-        $currentCookie = isset($_COOKIE[$_ENV["AuthCookieName"]]);
 
+        $currentCookie = null;
+
+        if(isset($_COOKIE[$_ENV["AuthCookieName"]]))
+            $currentCookie = $_COOKIE[$_ENV["AuthCookieName"]];
+        
         if($currentCookie)
             return $db->table("sessions")->where("sessionId", $currentCookie)->first();
 

@@ -31,7 +31,7 @@ class cookies {
             $expires = time() + 8600;
         }
 
-        setcookie($cookieName, $cookieValue, $expires, "", "." . $_ENV["Domain"], true);
+        setcookie($cookieName, $cookieValue, $expires, "/", "." . $_ENV["Domain"]);
     }
 
     // gets the value of an encrypted cookie

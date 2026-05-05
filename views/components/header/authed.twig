@@ -1,0 +1,9 @@
+<div class="nav-group">
+    <a href="/" class="nav-item">{{ env('APP_NAME') }}</a>
+    <a href="/home" class="nav-item">home</a>
+    <a href="/files" class="nav-item">files</a>
+</div>
+<div class="nav-group">
+    <a href="/accounts" class="nav-item">accounts</a>
+    <a href="/users/{{ currentuser.id }}/profile" class="nav-item">{{ currentuser.username }}</a>
+</div>
