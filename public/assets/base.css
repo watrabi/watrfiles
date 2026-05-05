@@ -5,6 +5,7 @@
     --nav-color: #289e9f;
     --container-color: #e3e1e1;
     --input-color: #e0e0e0;
+    --input-hover-color: #bdb9b9;
     --danger-color: #cc2828;
     --warning-color: #ffc800;
     --sidebar-color: #f1f1f1;
@@ -49,6 +50,7 @@ html, body {
     display: flex;
     flex-direction: row;
     align-content: center;
+    align-items: center;
     text-align: center;
     box-shadow: 10px 10px 10px 10px rgba(15, 15, 15, 0.5);
 }
@@ -62,8 +64,13 @@ html, body {
     margin-right: auto;
 }
 
-#footer p {
+#footer div {
+    display: flex;
+    flex-direction: row;
+    align-content: center;
     width: 100%;
+    align-items: center;
+    justify-content: center;
 }
 
 #site-warning {
@@ -74,6 +81,12 @@ html, body {
     width: 100%;
     text-align: left;
     box-shadow: 5px 5px 5px rgba(15, 15, 15, 0.4);
+}
+
+#dangermsg {
+    padding: 10px;
+    color: white;
+
 }
 
 #site-warning p {
@@ -184,19 +197,28 @@ html, body {
 }
 
 input {
-    margin-bottom: 10px;
     color: black;
     background-color: var(--input-color);
     border: none;
     padding: 10px;
+    border-radius: 0.3em;
+}
+
+input:hover {
+    background-color: var(--input-hover-color);
 }
 
 .button {
     background-color: var(--primary-color);
+    color: black;
+    text-decoration: none;
+    padding: 10px;
+    margin-right: 5px;
+    border: none;
 }
 
 #error-button {
-    color: white;
+    color: black;
     text-decoration: none;
     padding: 10px;
     margin-right: 5px;
@@ -206,8 +228,41 @@ input {
     margin-left: 15px;
 }
 
+#avatar {
+    margin-right: 25px;
+    width: 250px;
+    height: 250px;
+    position: relative;
+    background-size: cover;
+    background-position: center;
+}
+
 .button:hover {
     background-color: var(--secondary-color);
+}
+
+.status {
+    width: 25px;
+    height: 25px;
+    border: 2px solid rgb(48, 69, 96);
+    border-radius: 50%;
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    transform: translate(40%, -40%);
+    background-color: rgb(33, 34, 35);
+}
+
+img.emoji {
+    height: 20px;
+    width: 20px;
+    vertical-align: -5px;
+}
+
+#eotd2 {
+    vertical-align: -5px;
+    align-content: center;
+    display: inline-block;
 }
 
 .verticalLine {

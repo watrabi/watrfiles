@@ -6,6 +6,7 @@
 {% endblock %}
 
 {% block body %}
+
 <div class="div-center center">
     <div class="item-group">
         <div class="item-container">
@@ -25,13 +26,49 @@
             </div>
             </div>
             <div id="loginForm">
+                <div id="error-area">
+                    <div style="display: none;" class="danger" id="dangermsg">
+                        Incorrect Nword
+                    </div>
+                </div>
+                <br>
                 <form>
-                    <input type="username" name="username" placeholder="username"><br>
-                    <input type="password" name="password" placeholder="password"><br><br>
-                    <a id="error-button" class="button" href="#">Login</a>
+                    <input type="username" name="username" placeholder="username" id="username"><br>
+                    <input type="password" name="password" placeholder="password" id="password"><br><br>
+                    <a id="error-button" class="button" href="#" onclick="login()" id="loginButton">Login</a>
                 </form>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    let usernameInput = $("#username");
+    let passwordInput = $("#password");
+    let submitBtn = $("#loginButton");
+    let errorMsg = $("#dangermsg");
+
+    function login() {
+        $.post("/api/v1/auth/login", {
+            username: usernameInput.val(),
+            password: passwordInput.val()
+        }).fail(onError).done(didHappen);
+    }
+
+    function didHappen(data){
+        if(data.status == "Okay"){
+            errorMsg.css("display", "none");
+            window.location.href = "/home";
+        } else {
+            errorMsg.text(data.message);
+            errorMsg.css("display", "block");
+        }
+    }
+
+    function onError() {
+        errorMsg.text("An error occured.");
+        errorMsg.css("display", "block");
+    }
+</script>
+
 {% endblock %}

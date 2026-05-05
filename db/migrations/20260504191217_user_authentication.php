@@ -31,6 +31,8 @@ final class UserAuthentication extends AbstractMigration
         $users = $this->table('sessions');
         $users->addColumn('sessionId', 'string', ['limit' => 150])
               ->addColumn('userId', 'integer')
+              ->addColumn('userAgent', 'string', ['limit' => 150])
+              ->addColumn('created', 'biginteger')
               ->addIndex(['sessionId'], ['unique' => true])
               ->create();
     }

@@ -2,70 +2,50 @@
 
 namespace watrlabs;
 
-use watrlabs\sitefunctions;
-use watrlabs\watrkit\sanitize;
-use watrlabs\logging\discord;
-use Pixie\Connection;
-use Pixie\QueryBuilder\QueryBuilderHandler;
+use watrlabs\sessions;
 
 global $db;
 
 class authentication {
 
-    private $cookiename = "";
-    private $currentuser = false;
-
-    public function __construct(){
-        $this->cookiename = $_ENV["CookieName"];
-    }
-
-    public function getCookie(){
-        return $_COOKIE[$this->cookiename];
-    }
-
+    // returns current user information based on 
+    // the currently logged in user or provided id
     public function getUserInfo($id = null){
 
         global $db;
+        $sessions = new sessions();
 
-        if($id){
+        if($id)
             return $db->table("users")->where("id", $id)->first();
-        } else {
-            $sessionInfo = $this->getSessionInfo($this->getCookie());
 
-            if($sessionInfo){
-                $userInfo = $db->table("users")->where("id", $sessionInfo->userid)->first();
+        $currentSession = $sessions->getCurrentSession();
 
-                if($userInfo){
-                    $this->currentuser = $userInfo;
-                    return $userInfo;
-                }
-
-            } else {
-                return null;
-            }
-
+        if($currentSession){
+            return $db->table("users")->where("id", $currentSession->userId)->first();
         }
+
+
+        return null;
+        
     }
 
+    // MIGHT return a bool if the current user is signed in
     public function isLoggedIn(){ 
-        return  $this->getUserInfo();
+        return (bool) $this->getUserInfo();
     }
 
-    public function getSessionInfo($Session){
-        global $db;
-        $sessionInfo = $db->table("sessions")->where("session", $Session)->first();
-        return $sessionInfo;
-    }
-
-    public function create($username, $password) {
+    // creates a user and automatically signs them in
+    // returns an array if an error occurs.
+    public function createUser($username, $password) {
 
         global $db;
+        $sessions = new sessions();
 
         $doesExist = $db->table("users")->where("username", $username)->first();
 
-        if($doesExist)[
+        if($doesExist){
             return ["status"=>"error", "message"=>"Username is already taken."];
-        ]
+        }
 
         if(strlen($username) > 20){
             return ["status"=>"error", "message"=>"Username is too long."];
@@ -83,9 +63,11 @@ class authentication {
             "created"=>time()
         ];
 
-        $db->table("users")->insert($insert);
+        $userId = $db->table("users")->insert($insert);
 
-        
+        $sessions->createSession($userId);
+
+        return ["status"=>"Okay", "message"=>"Your account has been created!"];
 
     }
 

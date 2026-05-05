@@ -6,3 +6,7 @@
 #loginForm {
     margin-left: 40px;
 }
+
+input {
+    margin-bottom: 5px;
+}
