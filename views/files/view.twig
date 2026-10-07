@@ -1,0 +1,122 @@
+{% extends "models/base.twig" %}
+{% block pageName %}{{ file.title }}{% endblock %}
+
+{% block headerGoodies %}
+    <meta property="og:title" content="{{ file.title }}">
+    <meta property="og:site_name" content="{{ env('APP_NAME') }}">
+    {% if file.public %}
+        {% if file.fileType == 'image' %}
+            <meta property="og:image" content="{{ siteUrl }}/file/{{ file.publicId }}/raw">
+        {% elseif file.fileType == 'video' %}
+            <meta property="og:video" content="{{ siteUrl }}/file/{{ file.publicId }}/raw">
+        {% endif %}
+    {% endif %}
+{% endblock %}
+
+{% block body %}
+    <div class="page">
+        <div class="viewer">
+            {% if file.fileType == 'image' %}
+                <img src="/file/{{ file.publicId }}/raw" alt="{{ file.title }}">
+            {% elseif file.fileType == 'video' %}
+                <video src="/file/{{ file.publicId }}/raw" controls preload="metadata"></video>
+            {% else %}
+                <div class="audio-wrap">
+                    <i class="fa-solid fa-music"></i>
+                    <audio src="/file/{{ file.publicId }}/raw" controls preload="metadata"></audio>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="file-details">
+            <div>
+                <h1 id="fileTitle">{{ file.title }}</h1>
+                <p class="muted">
+                    Uploaded by
+                    {% if file.username %}<a href="/users/{{ file.userId }}/profile">{{ file.username }}</a>{% else %}a deleted user{% endif %}
+                    on {{ file.created|date('F j, Y') }}
+                    · {{ file.views }} views
+                    · {{ file.size|filesize }}
+                    {% if not file.public %}· <i class="fa-solid fa-lock"></i> private{% endif %}
+                </p>
+            </div>
+            <div class="file-actions">
+                <a class="button" href="/file/{{ file.publicId }}/raw?download=1"><i class="fa-solid fa-download"></i> Download</a>
+                <button class="button secondary" id="copyButton"><i class="fa-solid fa-link"></i> Copy link</button>
+            </div>
+        </div>
+
+        {% if isOwner %}
+            <div class="owner-panel">
+                <h2>Manage</h2>
+                <div style="display: none;" class="alert" id="dangermsg"></div>
+                <form id="editForm">
+                    <label class="field-label" for="title">Title</label>
+                    <input type="text" id="title" maxlength="100" value="{{ file.title }}">
+                    <label class="checkbox">
+                        <input type="checkbox" id="public" {{ file.public ? 'checked' }}>
+                        Show this on the public files page
+                    </label>
+                    <div>
+                        <button type="submit" class="button">Save</button>
+                        <button type="button" class="button danger" id="deleteButton"><i class="fa-solid fa-trash"></i> Delete</button>
+                    </div>
+                </form>
+            </div>
+        {% endif %}
+    </div>
+
+<script>
+    $("#copyButton").on("click", function () {
+        let button = $(this);
+        navigator.clipboard.writeText("{{ siteUrl|e('js') }}/file/{{ file.publicId }}").then(function () {
+            button.html('<i class="fa-solid fa-check"></i> Copied!');
+            setTimeout(function () { button.html('<i class="fa-solid fa-link"></i> Copy link'); }, 1500);
+        });
+    });
+
+    {% if isOwner %}
+    let errorMsg = $("#dangermsg");
+
+    function showMessage(message, good) {
+        errorMsg.text(message);
+        errorMsg.toggleClass("danger", !good).toggleClass("success", !!good);
+        errorMsg.css("display", "block");
+    }
+
+    $("#editForm").on("submit", function (e) {
+        e.preventDefault();
+
+        $.post("/api/v1/files/{{ file.publicId }}/update", {
+            title: $("#title").val(),
+            public: $("#public").is(":checked") ? "1" : "0"
+        }).done(function (data) {
+            if (data.status == "Okay") {
+                $("#fileTitle").text($("#title").val().trim());
+                showMessage(data.message, true);
+            } else {
+                showMessage(data.message);
+            }
+        }).fail(function () {
+            showMessage("An error occured.");
+        });
+    });
+
+    $("#deleteButton").on("click", function () {
+        if (!confirm("Delete this file? This can't be undone.")) {
+            return;
+        }
+
+        $.post("/api/v1/files/{{ file.publicId }}/delete").done(function (data) {
+            if (data.status == "Okay") {
+                window.location.href = "/home";
+            } else {
+                showMessage(data.message);
+            }
+        }).fail(function () {
+            showMessage("An error occured.");
+        });
+    });
+    {% endif %}
+</script>
+{% endblock %}

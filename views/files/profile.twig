@@ -1,0 +1,13 @@
+{% extends "models/base.twig" %}
+{% block pageName %}{{ profile.username }}{% endblock %}
+{% block body %}
+    <div class="page">
+        <div class="section-header">
+            <h1>{{ profile.username }}</h1>
+            {% if isSelf %}<a class="button secondary" href="/accounts">Account settings</a>{% endif %}
+        </div>
+        <p class="muted">Joined {{ profile.created|date('F j, Y') }} · {{ total }} {{ isSelf ? '' : 'public ' }}{{ total == 1 ? 'file' : 'files' }}</p>
+        {% include 'components/filegrid.twig' with { showOwner: false, emptyMessage: profile.username ~ " hasn't uploaded anything public yet." } %}
+        {% include 'components/pagination.twig' %}
+    </div>
+{% endblock %}

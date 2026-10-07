@@ -19,27 +19,12 @@ $router->group('/api/v1/auth', function($router) {
 
     // route to let users interact with the login api
     $router->post("/login", function(){
-        global $db;
 
-        $sessions = new sessions();
-
-        if(isset($_POST["username"]) && $_POST["password"]){
+        if(isset($_POST["username"], $_POST["password"])){
 
             $auth = new authentication();
 
-            $username = $_POST["username"];
-            $password = $_POST["password"];
-
-            $userInfo = $db->table("users")->where("username", $username)->first();
-
-            if($userInfo){
-                if(password_verify($password, $userInfo->password)){
-                    $sessions->createSession($userInfo->id);
-                    return ["status"=>"Okay", "message"=>"you good"];
-                }
-            } else {
-                return ["status"=>"error","message"=>"Username or password is incorrect."];
-            }
+            return $auth->login($_POST["username"], $_POST["password"]);
 
         }
 
@@ -50,7 +35,7 @@ $router->group('/api/v1/auth', function($router) {
     // route to let users interact with the register api
     $router->post("/register", function () {
 
-        if(isset($_POST["username"]) && $_POST["password"]){
+        if(isset($_POST["username"], $_POST["password"])){
 
             $auth = new authentication();
 
@@ -61,7 +46,15 @@ $router->group('/api/v1/auth', function($router) {
 
         }
 
-        return ["error"=>"Invalid Request"];
+        return ["status"=>"error","message"=>"Invalid Request"];
+    });
+
+    // signs you out
+    $router->post("/logout", function () {
+        $sessions = new sessions();
+        $sessions->destroyCurrentSession();
+
+        return ["status"=>"Okay", "message"=>"bye"];
     });
     
 });
@@ -72,13 +65,25 @@ $router->group('/auth', function($router) {
     
     // endpoint to show the register page
     $router->get("/register", function () {
-        global $twig;
+        global $twig, $currentuser;
+
+        if($currentuser){
+            header("Location: /home");
+            return;
+        }
+
         echo $twig->render('auth/register.twig');
     });
 
     // endpoint to show the login page
     $router->get("/login", function () {
-        global $twig;
+        global $twig, $currentuser;
+
+        if($currentuser){
+            header("Location: /home");
+            return;
+        }
+
         echo $twig->render('auth/login.twig');
     });
     

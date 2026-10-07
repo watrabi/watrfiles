@@ -16,6 +16,12 @@ and then run\
 \
 and you should be good to go\
 
+# Uploads
+files go in `storage/files` by default (make sure php can write to it)\
+if you fill out the R2 stuff in .env they go to R2 instead\
+the upload limit is `MAX_UPLOAD_MB` in .env, but php.ini also has to allow it (`upload_max_filesize` and `post_max_size`)\
+people can upload images (png, jpg, gif, webp), videos (mp4, webm, mov) and audio (mp3, ogg, wav)\
+
 reminder: this uses twig now\
 so try and keep your templates twig like\
 

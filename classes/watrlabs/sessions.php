@@ -7,6 +7,13 @@ use watrlabs\cookies;
 
 class sessions {
 
+    const SESSION_LENGTH = 2629743; // about a month
+
+    // name of the cookie that holds the session id
+    static function cookieName(){
+        return $_ENV["AuthCookieName"] ?? "files_auth";
+    }
+
     // creates a session, you can assign a userid
     public function createSession($userId = null){
         
@@ -18,7 +25,7 @@ class sessions {
 
         $insert = [
             "sessionId"=>$sessionId,
-            "userAgent"=>$_SERVER['HTTP_USER_AGENT'],
+            "userAgent"=>mb_substr($_SERVER['HTTP_USER_AGENT'] ?? "", 0, 150),
             "created"=>time()
         ];
 
@@ -28,7 +35,7 @@ class sessions {
 
         $db->table("sessions")->insert($insert);
 
-        $cookies->createCookie($sessionId, false, "files_auth", time() + 2629743);
+        $cookies->createCookie($sessionId, false, self::cookieName(), time() + self::SESSION_LENGTH);
 
         return $sessionId;
 
@@ -38,15 +45,44 @@ class sessions {
 
         global $db;
 
-        $currentCookie = null;
+        $currentCookie = $_COOKIE[self::cookieName()] ?? null;
 
-        if(isset($_COOKIE[$_ENV["AuthCookieName"]]))
-            $currentCookie = $_COOKIE[$_ENV["AuthCookieName"]];
-        
+        if(!$currentCookie)
+            return null;
+
+        $session = $db->table("sessions")->where("sessionId", $currentCookie)->first();
+
+        if($session && $session->created + self::SESSION_LENGTH < time())
+            return null;
+
+        return $session;
+    }
+
+    // logs out the current session
+    public function destroyCurrentSession(){
+
+        global $db;
+        $cookies = new cookies();
+
+        $currentCookie = $_COOKIE[self::cookieName()] ?? null;
+
         if($currentCookie)
-            return $db->table("sessions")->where("sessionId", $currentCookie)->first();
+            $db->table("sessions")->where("sessionId", $currentCookie)->delete();
 
-        return null;
+        $cookies->destroyCookie(self::cookieName());
+    }
+
+    // logs a user out everywhere except the current session
+    public function destroyOtherSessions($userId){
+
+        global $db;
+
+        $currentCookie = $_COOKIE[self::cookieName()] ?? "";
+
+        $db->table("sessions")
+            ->where("userId", $userId)
+            ->where("sessionId", "!=", $currentCookie)
+            ->delete();
     }
 
 }

@@ -29,7 +29,7 @@ class roles {
         $insert = array(
             "roleid"=>$roleid,
             "userid"=>$userid
-        )
+        );
 
         $db->table("hasrole")->insert($insert);
 

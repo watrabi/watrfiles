@@ -1,0 +1,12 @@
+{# expects: page, pages #}
+{% if pages > 1 %}
+    <div class="pagination">
+        {% if page > 1 %}
+            <a class="button" href="?page={{ page - 1 }}"><i class="fa-solid fa-arrow-left"></i> Newer</a>
+        {% endif %}
+        <span>Page {{ page }} of {{ pages }}</span>
+        {% if page < pages %}
+            <a class="button" href="?page={{ page + 1 }}">Older <i class="fa-solid fa-arrow-right"></i></a>
+        {% endif %}
+    </div>
+{% endif %}

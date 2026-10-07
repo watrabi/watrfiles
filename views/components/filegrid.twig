@@ -1,0 +1,33 @@
+{# expects: files, and optionally showOwner #}
+{% if files is empty %}
+    <div class="empty-state">
+        <i class="fa-regular fa-folder-open"></i>
+        <p>{{ emptyMessage|default('Nothing here yet.') }}</p>
+    </div>
+{% else %}
+    <div class="file-grid">
+        {% for file in files %}
+            <a class="file-card" href="/file/{{ file.publicId }}">
+                <div class="file-thumb">
+                    {% if file.fileType == 'image' %}
+                        <img src="/file/{{ file.publicId }}/raw" alt="{{ file.title }}" loading="lazy">
+                    {% elseif file.fileType == 'video' %}
+                        <video src="/file/{{ file.publicId }}/raw#t=0.1" preload="metadata" muted></video>
+                        <span class="thumb-badge"><i class="fa-solid fa-play"></i></span>
+                    {% else %}
+                        <i class="fa-solid fa-music thumb-icon"></i>
+                    {% endif %}
+                    {% if not file.public %}
+                        <span class="thumb-badge private" title="Private"><i class="fa-solid fa-lock"></i></span>
+                    {% endif %}
+                </div>
+                <div class="file-info">
+                    <div class="file-title">{{ file.title }}</div>
+                    <div class="file-meta">
+                        {% if showOwner is not defined or showOwner %}{{ file.username|default('deleted user') }} · {% endif %}{{ file.views }} views · {{ file.created|date('M j, Y') }}
+                    </div>
+                </div>
+            </a>
+        {% endfor %}
+    </div>
+{% endif %}

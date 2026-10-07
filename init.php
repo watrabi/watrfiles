@@ -21,6 +21,10 @@ spl_autoload_register(function ($class_name) {
 });
 
 set_error_handler(function ($errno, $errstr, $errfile, $errline) {
+    // pixie is old and makes php 8.2+ complain, don't die over it
+    if ($errno === E_DEPRECATED || $errno === E_USER_DEPRECATED) {
+        return true;
+    }
     throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
 });
 
@@ -55,10 +59,17 @@ $twig = new \Twig\Environment($loader, [
 ]);
 
 $twig->addFunction(new \Twig\TwigFunction('env', function ($key) {
-    return $_ENV[$key];
+    return $_ENV[$key] ?? null;
+}));
+
+$twig->addFilter(new \Twig\TwigFilter('filesize', function ($bytes) {
+    return \watrlabs\files::formatSize($bytes);
 }));
 
 $auth = new authentication();
 $currentuser = $auth->getUserInfo();
 
 $twig->addGlobal("currentuser", $currentuser);
+
+$scheme = (isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] !== "off") ? "https" : "http";
+$twig->addGlobal("siteUrl", $scheme . "://" . ($_SERVER["HTTP_HOST"] ?? "localhost"));

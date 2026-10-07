@@ -29,7 +29,8 @@ try {
         $routers = [
             "web",
             "auth",
-
+            "files",
+            "account",
         ];
 
         foreach ($routers as $r) {
@@ -41,7 +42,9 @@ try {
         $method = $_SERVER['REQUEST_METHOD'];
         $response = $router->dispatch($uri, $method);
 
-        ob_end_flush();
+        // serving files clears the buffer early
+        if(ob_get_level() > 0)
+            ob_end_flush();
 
     } catch(PDOException $e){
         handle_error($e);
@@ -56,17 +59,21 @@ function handle_error($e){
     $log = new discord();
     try {
         $log->internal_log($e, "Site Error!");
-        ob_clean();
+        if(ob_get_level() > 0)
+            ob_clean();
         file_put_contents("../storage/errorlog.log", $e . "\n\n", FILE_APPEND);
         http_response_code(500);
         global $twig;
-        echo $e;
+        if(($_ENV["APP_DEBUG"] ?? "false") === "true")
+            echo $e;
         echo $twig->render('status_codes/500.twig');
     } catch(ErrorException $e){
         $log->internal_log($e, "Site Error!");
-        ob_clean();
+        if(ob_get_level() > 0)
+            ob_clean();
         http_response_code(500);
-        echo $e;
+        if(($_ENV["APP_DEBUG"] ?? "false") === "true")
+            echo $e;
         file_put_contents("../storage/errorlog.log", $e . "\n\n", FILE_APPEND);
         die("Couldn't process your request. Please try again later.");
     }

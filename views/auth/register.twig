@@ -1,5 +1,5 @@
 {% extends "models/base.twig" %}
-{% block pageName %}Login{% endblock %}
+{% block pageName %}Register{% endblock %}
 
 {% block headerGoodies %}
 <link rel="stylesheet" href="/assets/authpages.css">
@@ -32,12 +32,13 @@
                     </div>
                 </div>
                 <br>
-                <form>
-                    <input type="username" name="username" placeholder="username" id="username"><br>
-                    <input type="password" name="password" placeholder="password" id="password"><br><br>
-                    <input type="password" name="passwordconf" placeholder="password" id="passwordconf"><br><br>
-                    <a id="error-button" class="button" href="#" onclick="register()" id="loginButton">Register</a>
+                <form id="authForm">
+                    <input type="text" autocomplete="username" name="username" placeholder="username" id="username"><br>
+                    <input type="password" name="password" placeholder="password" id="password" autocomplete="new-password"><br>
+                    <input type="password" name="passwordconf" placeholder="password again" id="passwordconf" autocomplete="new-password"><br><br>
+                    <button type="submit" class="button" id="loginButton">Register</button>
                 </form>
+                <p class="muted">Already have an account? <a href="/auth/login">Login</a></p>
             </div>
         </div>
     </div>
@@ -50,12 +51,17 @@
     let submitBtn = $("#loginButton");
     let errorMsg = $("#dangermsg");
 
+    $("#authForm").on("submit", function (e) {
+        e.preventDefault();
+        register();
+    });
+
     function register() {
 
         errorMsg.css("display", "none");
 
-        password = passwordInput.val();
-        passwordConf = passwordValInput.val();
+        let password = passwordInput.val();
+        let passwordConf = passwordValInput.val();
 
         if(password != passwordConf){
             errorMsg.text("Your passwords do not match.");

@@ -31,7 +31,25 @@ class cookies {
             $expires = time() + 8600;
         }
 
-        setcookie($cookieName, $cookieValue, $expires, "/", "." . $_ENV["Domain"]);
+        setcookie($cookieName, $cookieValue, $this->cookieOptions($expires));
+    }
+
+    // shared cookie settings
+    // lax samesite so other sites can't post to the api as you
+    private function cookieOptions($expires){
+        $options = [
+            "expires" => $expires,
+            "path" => "/",
+            "secure" => isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] !== "off",
+            "httponly" => true,
+            "samesite" => "Lax",
+        ];
+
+        $domain = $_ENV["Domain"] ?? "";
+        if($domain && $domain !== "localhost")
+            $options["domain"] = "." . $domain;
+
+        return $options;
     }
 
     // gets the value of an encrypted cookie
@@ -43,7 +61,7 @@ class cookies {
 
         $cookieName = $this->valcookie($cookieName);
 
-        if($_COOKIE[$cookieName]){
+        if(isset($_COOKIE[$cookieName])){
             $cookieValue = $_COOKIE[$cookieName];
         }
 
@@ -59,7 +77,7 @@ class cookies {
 
         $cookieValue = "Bogus Value. Phak You."; // best auth
 
-        setcookie($cookieName, $cookieValue, 0, "", "." . $_ENV["Domain"], true);
+        setcookie($cookieName, $cookieValue, $this->cookieOptions(time() - 3600));
     }
 
 }

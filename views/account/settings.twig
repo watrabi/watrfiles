@@ -1,0 +1,57 @@
+{% extends "models/base.twig" %}
+{% block pageName %}Account{% endblock %}
+{% block body %}
+    <div class="page narrow">
+        <h1>Account</h1>
+
+        <div class="stats">
+            <div class="stat"><span class="stat-value">{{ currentuser.username }}</span><span class="stat-label">username</span></div>
+            <div class="stat"><span class="stat-value">{{ stats.count }}</span><span class="stat-label">files</span></div>
+            <div class="stat"><span class="stat-value">{{ stats.size|filesize }}</span><span class="stat-label">used</span></div>
+        </div>
+
+        <h2>Change password</h2>
+        <div style="display: none;" class="alert" id="dangermsg"></div>
+        <form id="passwordForm">
+            <input type="password" id="current" placeholder="current password" autocomplete="current-password">
+            <input type="password" id="new" placeholder="new password" autocomplete="new-password">
+            <input type="password" id="confirm" placeholder="new password again" autocomplete="new-password">
+            <div><button type="submit" class="button">Change password</button></div>
+        </form>
+
+        <h2>Sign out</h2>
+        <p class="muted">Changing your password signs you out everywhere else.</p>
+        <button class="button danger" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+    </div>
+
+<script>
+    let errorMsg = $("#dangermsg");
+
+    function showMessage(message, good) {
+        errorMsg.text(message);
+        errorMsg.toggleClass("danger", !good).toggleClass("success", !!good);
+        errorMsg.css("display", "block");
+    }
+
+    $("#passwordForm").on("submit", function (e) {
+        e.preventDefault();
+
+        if ($("#new").val() != $("#confirm").val()) {
+            showMessage("Your new passwords do not match.");
+            return;
+        }
+
+        $.post("/api/v1/account/password", {
+            current: $("#current").val(),
+            new: $("#new").val()
+        }).done(function (data) {
+            showMessage(data.message, data.status == "Okay");
+            if (data.status == "Okay") {
+                $("#passwordForm")[0].reset();
+            }
+        }).fail(function () {
+            showMessage("An error occured.");
+        });
+    });
+</script>
+{% endblock %}

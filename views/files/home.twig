@@ -1,0 +1,21 @@
+{% extends "models/base.twig" %}
+{% block pageName %}Your files{% endblock %}
+{% block body %}
+    <div class="page">
+        <div class="section-header">
+            <h1>Hio, {{ currentuser.username }}</h1>
+            <a class="button" href="/upload"><i class="fa-solid fa-upload"></i> Upload</a>
+        </div>
+        <p class="muted">You registered on {{ currentuser.created|date('F j, Y') }}.</p>
+
+        <div class="stats">
+            <div class="stat"><span class="stat-value">{{ stats.count }}</span><span class="stat-label">files</span></div>
+            <div class="stat"><span class="stat-value">{{ stats.size|filesize }}</span><span class="stat-label">used</span></div>
+            <div class="stat"><span class="stat-value">{{ stats.views }}</span><span class="stat-label">total views</span></div>
+        </div>
+
+        <h2>Files you own</h2>
+        {% include 'components/filegrid.twig' with { showOwner: false, emptyMessage: "You haven't uploaded anything yet." } %}
+        {% include 'components/pagination.twig' %}
+    </div>
+{% endblock %}

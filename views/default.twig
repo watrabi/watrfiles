@@ -1,8 +1,25 @@
 {% extends "models/base.twig" %}
-{% block pageName %}landing{% endblock %}
+{% block pageName %}Home{% endblock %}
 {% block body %}
-    <div class="header">
-        <h1>Hello World!</h1>
-        <p>If you're seeing this, watrkit has been setup!</p>
+    <div class="hero">
+        <h1>the watr files</h1>
+        <p>An open community for images, videos and sounds. Upload stuff, share the link, done.</p>
+        <div class="hero-actions">
+            {% if currentuser %}
+                <a class="button" href="/upload"><i class="fa-solid fa-upload"></i> Upload a file</a>
+                <a class="button secondary" href="/home">Your files</a>
+            {% else %}
+                <a class="button" href="/auth/register">Sign up</a>
+                <a class="button secondary" href="/auth/login">Login</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="page">
+        <div class="section-header">
+            <h2>Recent uploads</h2>
+            <a href="/files">See all <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+        {% include 'components/filegrid.twig' with { emptyMessage: 'No one has uploaded anything yet. Be the first!' } %}
     </div>
 {% endblock %}

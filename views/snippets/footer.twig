@@ -1,8 +1,5 @@
 {% block footer %}
-
 <div id="footer">
-    <div style="flex-direction: row;"><div>©{{ env('APP_NAME') }} - 2026</div></div>
+    <div style="flex-direction: row;"><div>©{{ env('APP_NAME') }} - {{ "now"|date("Y") }}</div></div>
 </div>
-</body>
-</html>
 {% endblock %}

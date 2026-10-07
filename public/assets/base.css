@@ -268,3 +268,394 @@ img.emoji {
 .verticalLine {
   border-right: thick solid #000000;
 }
+
+/* ---- files ---- */
+
+:root {
+    --text-muted: #5f6b6b;
+    --card-color: #f4f6f6;
+    --border-color: #d6dcdc;
+    --success-color: #1f8a4c;
+}
+
+a {
+    color: var(--nav-color);
+}
+
+.muted {
+    color: var(--text-muted);
+}
+
+.nav-brand {
+    font-weight: 700;
+}
+
+#main {
+    flex: 1 0 auto;
+    height: auto;
+}
+
+#footer {
+    flex-shrink: 0;
+}
+
+button.button {
+    font: inherit;
+    cursor: pointer;
+}
+
+.button {
+    display: inline-block;
+    border-radius: 0.3em;
+}
+
+.button.secondary {
+    background-color: var(--input-color);
+}
+
+.button.secondary:hover {
+    background-color: var(--input-hover-color);
+}
+
+.button.danger {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+.button.danger:hover {
+    background-color: #a51f1f;
+}
+
+.button:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+.page {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px 16px 40px;
+    box-sizing: border-box;
+}
+
+.page.narrow {
+    max-width: 560px;
+}
+
+.hero {
+    background-color: var(--sidebar-color);
+    padding: 48px 16px;
+    text-align: center;
+}
+
+.hero h1 {
+    margin: 0 0 8px;
+    font-size: 2.4rem;
+}
+
+.hero p {
+    margin: 0 auto 24px;
+    max-width: 480px;
+    color: var(--text-muted);
+}
+
+.hero-actions .button {
+    margin: 0 4px;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.file-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.file-card {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--card-color);
+    border: 1px solid var(--border-color);
+    border-radius: 0.4em;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+}
+
+.file-card:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 2px 8px rgba(15, 15, 15, 0.15);
+}
+
+.file-thumb {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    background-color: #1c2424;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.file-thumb img,
+.file-thumb video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.thumb-icon {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+}
+
+.thumb-badge {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    border-radius: 0.3em;
+    padding: 3px 7px;
+    font-size: 0.8rem;
+}
+
+.thumb-badge.private {
+    left: auto;
+    right: 8px;
+}
+
+.file-info {
+    padding: 10px 12px;
+}
+
+.file-title {
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.file-meta {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 48px 16px;
+    color: var(--text-muted);
+}
+
+.empty-state i {
+    font-size: 2.5rem;
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.stats {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 16px 0;
+}
+
+.stat {
+    flex: 1 1 140px;
+    background-color: var(--card-color);
+    border: 1px solid var(--border-color);
+    border-radius: 0.4em;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-value {
+    font-size: 1.4rem;
+    font-weight: 700;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.stat-label {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.alert {
+    padding: 10px;
+    border-radius: 0.3em;
+    color: white;
+    margin-bottom: 12px;
+}
+
+.alert.success {
+    background-color: var(--success-color);
+}
+
+.page form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.field-label {
+    font-weight: 600;
+    margin-bottom: -4px;
+}
+
+.checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dropzone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 40px 16px;
+    border: 2px dashed var(--border-color);
+    border-radius: 0.4em;
+    background-color: var(--card-color);
+    cursor: pointer;
+    text-align: center;
+    word-break: break-all;
+}
+
+.dropzone i {
+    font-size: 2.5rem;
+    color: var(--secondary-color);
+}
+
+.dropzone input {
+    display: none;
+}
+
+.dropzone.dragging,
+.dropzone:hover {
+    border-color: var(--primary-color);
+}
+
+.dropzone.has-file {
+    border-style: solid;
+    border-color: var(--secondary-color);
+}
+
+.progress {
+    height: 8px;
+    background-color: var(--input-color);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0;
+    background-color: var(--primary-color);
+}
+
+.viewer {
+    background-color: #1c2424;
+    border-radius: 0.4em;
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.viewer img,
+.viewer video {
+    max-width: 100%;
+    max-height: 70vh;
+    display: block;
+}
+
+.audio-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 40px 16px;
+    width: 100%;
+}
+
+.audio-wrap i {
+    font-size: 3rem;
+    color: var(--primary-color);
+}
+
+.audio-wrap audio {
+    width: 100%;
+    max-width: 480px;
+}
+
+.file-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+}
+
+.file-details h1 {
+    margin: 0 0 4px;
+    word-break: break-word;
+}
+
+.file-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.owner-panel {
+    margin-top: 24px;
+    padding: 16px;
+    background-color: var(--card-color);
+    border: 1px solid var(--border-color);
+    border-radius: 0.4em;
+    max-width: 560px;
+}
+
+.owner-panel h2 {
+    margin-top: 0;
+}
+
+@media screen and (max-width: 600px) {
+    #navbar {
+        height: auto;
+        flex-wrap: wrap;
+        padding: 6px 0;
+    }
+
+    .verticalLine {
+        border-right: none;
+    }
+
+    #loginthing {
+        padding-right: 0;
+    }
+
+    #loginForm {
+        margin-left: 0;
+    }
+}
+
+.page form .button {
+    margin-right: 0;
+}

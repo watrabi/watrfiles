@@ -32,11 +32,12 @@
                     </div>
                 </div>
                 <br>
-                <form>
-                    <input type="username" name="username" placeholder="username" id="username"><br>
-                    <input type="password" name="password" placeholder="password" id="password"><br><br>
-                    <a id="error-button" class="button" href="#" onclick="login()" id="loginButton">Login</a>
+                <form id="authForm">
+                    <input type="text" autocomplete="username" name="username" placeholder="username" id="username"><br>
+                    <input type="password" name="password" placeholder="password" id="password" autocomplete="current-password"><br><br>
+                    <button type="submit" class="button" id="loginButton">Login</button>
                 </form>
+                <p class="muted">No account? <a href="/auth/register">Sign up</a></p>
             </div>
         </div>
     </div>
@@ -47,6 +48,11 @@
     let passwordInput = $("#password");
     let submitBtn = $("#loginButton");
     let errorMsg = $("#dangermsg");
+
+    $("#authForm").on("submit", function (e) {
+        e.preventDefault();
+        login();
+    });
 
     function login() {
         $.post("/api/v1/auth/login", {

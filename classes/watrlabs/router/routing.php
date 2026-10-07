@@ -77,14 +77,7 @@ class Routing {
         $uri = rtrim($uri, '/') ?: '/';
         
         if (isset($this->routes[$method][$uri])) {
-            $method = call_user_func($this->routes[$method][$uri]);
-            if(is_array($method)){
-                header("Content-type: application/json");
-                echo json_encode($method);
-                die();
-            } else {
-                return $method;
-            }
+            return $this->respond(call_user_func($this->routes[$method][$uri]));
         }
         
         if(isset($this->routes[$method])) {
@@ -93,7 +86,7 @@ class Routing {
                 
                 if(preg_match($regex, $uri, $matches)) {
                     array_shift($matches);
-                    return call_user_func_array($callback, $matches);
+                    return $this->respond(call_user_func_array($callback, $matches));
                 }
                 
             }
@@ -108,6 +101,17 @@ class Routing {
         return $this->return_status(404);
     }
 
+    // arrays become json responses (the funny laravel thing)
+    protected function respond($result) {
+        if(is_array($result)){
+            header("Content-type: application/json");
+            echo json_encode($result);
+            die();
+        }
+
+        return $result;
+    }
+
     public function addrouter($routername) {
         require_once "../routes/{$routername}.php";
     }
@@ -117,8 +121,8 @@ class Routing {
     }
 
     public function return_status($statuscode){
-        call_user_func($this->notfound);
         http_response_code($statuscode);
+        call_user_func($this->notfound);
     }
     
     protected function convertregex($pattern) {

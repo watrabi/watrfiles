@@ -1,0 +1,12 @@
+{% extends "models/base.twig" %}
+{% block pageName %}Files{% endblock %}
+{% block body %}
+    <div class="page">
+        <div class="section-header">
+            <h1>Public files</h1>
+            <span class="muted">{{ total }} {{ total == 1 ? 'file' : 'files' }}</span>
+        </div>
+        {% include 'components/filegrid.twig' with { emptyMessage: 'No public files yet.' } %}
+        {% include 'components/pagination.twig' %}
+    </div>
+{% endblock %}
