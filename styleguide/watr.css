@@ -1,0 +1,925 @@
+/*
+    watr.css — the watr style, portable edition
+    drop it into any site, then retune the knobs in your own :root.
+    everything lives in @layer watr, so any normal css you write wins.
+*/
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+@layer watr.tokens, watr.base, watr.components;
+
+/* ---------- knobs: change these per site ---------- */
+@layer watr.tokens {
+    :root {
+        --watr-hue: 196;          /* the one color. watrfiles = 196, watrlabs = 237 */
+        --watr-chroma: 1;         /* 0.4 = calm, 1 = normal, 1.3 = loud */
+        --watr-lift: 5px;         /* how far things float. 3px flat, 5px normal, 8px dramatic */
+        --watr-head-weight: 700;  /* heading weight. 500 calm, 700 normal, 900 shouty */
+        --watr-speed: 0.2s;       /* everything moves at this speed */
+        --watr-toast-time: 4s;    /* how long a toast stays up */
+    }
+
+    /* ---------- derived: don't edit these, edit the knobs ---------- */
+    /* add .watr-scope to any element to re-hue just that part of the page */
+    :root, .watr-scope {
+        /* the water ramp: one hue, four depths */
+        --watr-bright: oklch(78% calc(0.13 * var(--watr-chroma)) var(--watr-hue));
+        --watr-mid:    oklch(69% calc(0.11 * var(--watr-chroma)) var(--watr-hue));
+        --watr-bar:    oklch(64% calc(0.10 * var(--watr-chroma)) var(--watr-hue));
+        --watr-deep:   oklch(41% calc(0.07 * var(--watr-chroma)) var(--watr-hue));
+
+        /* neutrals lean a tiny bit toward the hue so every site feels its own */
+        --watr-page:       #ffffff;
+        --watr-surface:    oklch(95.8% 0.004 var(--watr-hue));
+        --watr-panel:      oklch(96.5% calc(0.025 * var(--watr-chroma)) var(--watr-hue));  /* a pale wash of the hue */
+        --watr-field:      oklch(90.7% 0.004 var(--watr-hue));
+        --watr-field-over: oklch(79% 0.006 var(--watr-hue));
+        --watr-text:       oklch(16% 0.012 var(--watr-hue));
+        --watr-muted:      oklch(42% 0.012 var(--watr-hue));
+        --watr-ink:        oklch(14% 0.015 var(--watr-hue));  /* text on bright fills, in both themes */
+        --watr-on-bar:     #ffffff;
+        --watr-rule:       var(--watr-text);
+
+        /* signals. these never follow the hue */
+        --watr-danger:  #cc2828;
+        --watr-warning: #ffc800;
+
+        /* the drop: light always comes from the top-left */
+        --watr-shadow-color: rgb(15 15 15 / 0.4);
+        --watr-drop:      var(--watr-lift) var(--watr-lift) var(--watr-lift) var(--watr-shadow-color);
+        --watr-drop-big:  calc(var(--watr-lift) * 2) calc(var(--watr-lift) * 2) calc(var(--watr-lift) * 2) var(--watr-shadow-color);
+
+        --watr-font: "Montserrat", "Segoe UI", system-ui, sans-serif;
+        --watr-bar-h: 45px;
+        --watr-foot-h: 50px;
+        --watr-field-radius: 0.3em;
+        --watr-rule-w: 5px;
+        --watr-sidebar-w: 250px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]), :root:not([data-theme="light"]) .watr-scope {
+            --watr-page:       oklch(19% 0.012 var(--watr-hue));
+            --watr-surface:    oklch(23% 0.014 var(--watr-hue));
+            --watr-panel:      oklch(27% calc(0.03 * var(--watr-chroma)) var(--watr-hue));
+            --watr-field:      oklch(30% 0.016 var(--watr-hue));
+            --watr-field-over: oklch(37% 0.02 var(--watr-hue));
+            --watr-text:       oklch(94% 0.008 var(--watr-hue));
+            --watr-muted:      oklch(74% 0.012 var(--watr-hue));
+            --watr-bar:        oklch(50% calc(0.09 * var(--watr-chroma)) var(--watr-hue));
+            --watr-shadow-color: rgb(0 0 0 / 0.55);
+            }
+    }
+    :root[data-theme="dark"], :root[data-theme="dark"] .watr-scope {
+        --watr-page:       oklch(19% 0.012 var(--watr-hue));
+        --watr-surface:    oklch(23% 0.014 var(--watr-hue));
+        --watr-panel:      oklch(27% calc(0.03 * var(--watr-chroma)) var(--watr-hue));
+        --watr-field:      oklch(30% 0.016 var(--watr-hue));
+        --watr-field-over: oklch(37% 0.02 var(--watr-hue));
+        --watr-text:       oklch(94% 0.008 var(--watr-hue));
+        --watr-muted:      oklch(74% 0.012 var(--watr-hue));
+        --watr-bar:        oklch(50% calc(0.09 * var(--watr-chroma)) var(--watr-hue));
+        --watr-shadow-color: rgb(0 0 0 / 0.55);
+    }
+}
+
+/* ---------- page: outside the layers on purpose ----------
+   resets (normalize.css, a host's base styles) are usually unlayered, and an
+   unlayered rule always beats a layered one, so the page background, text and
+   font would get stuck on the reset's values. these few live out here instead.
+   anything you write after watr.css still wins. */
+body {
+    font: 1rem/normal var(--watr-font);
+    background-color: var(--watr-page);
+    color: var(--watr-text);
+}
+:root { color-scheme: light; }
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { color-scheme: dark; }
+}
+:root[data-theme="dark"] { color-scheme: dark; }
+
+/* ---------- base ---------- */
+@layer watr.base {
+    *, *::before, *::after {
+        transition: var(--watr-speed);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        :root { --watr-speed: 0s; }
+    }
+
+    html, body {
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+    }
+
+    body {
+        display: flex;
+        flex-direction: column;
+    }
+
+    h1, h2, h3 {
+        font-weight: var(--watr-head-weight);
+        text-wrap: balance;
+    }
+
+    h1 { margin-bottom: 0.25rem; }
+
+    a { color: inherit; }
+
+    input, select, textarea {
+        font: inherit;
+        color: var(--watr-text);
+        background-color: var(--watr-field);
+        border: none;
+        padding: 10px;
+        border-radius: var(--watr-field-radius);
+    }
+
+    input:hover, select:hover, textarea:hover {
+        background-color: var(--watr-field-over);
+    }
+
+    :focus-visible {
+        outline: 3px solid var(--watr-bright);
+        outline-offset: 2px;
+    }
+
+    ::selection {
+        background-color: var(--watr-bright);
+        color: var(--watr-ink);
+    }
+}
+
+/* ---------- components ---------- */
+@layer watr.components {
+
+    /* bars: the page is framed top and bottom by full-width color */
+    .watr-bar {
+        color: var(--watr-on-bar);
+        background-color: var(--watr-bar);
+        min-height: var(--watr-bar-h);
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: var(--watr-drop);
+        position: relative;
+        z-index: 3;
+    }
+
+    .watr-bar__group {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        padding-inline: 15px;
+    }
+
+    .watr-bar a {
+        color: var(--watr-on-bar);
+        text-decoration: none;
+        padding: 5px;
+        font-weight: 600;
+        white-space: nowrap;
+        text-transform: lowercase;
+    }
+
+    .watr-bar a:hover { text-decoration: underline; text-underline-offset: 4px; }
+
+    .watr-bar .watr-bar__home { text-transform: none; }
+
+    /* the newer bar markup: home link, a phone menu button, then the link groups.
+       <nav class="watr-bar">
+           <a class="watr-bar__home" href="/">watrfiles</a>
+           <button class="watr-bar__toggle" type="button">menu</button>
+           <div class="watr-bar__links"><div class="watr-bar__group">...</div><div class="watr-bar__group">...</div></div>
+       </nav>
+       watr.js turns the button on. without js the links just wrap like before. */
+    .watr-bar > .watr-bar__home { margin-left: 15px; }
+    .watr-bar__links {
+        flex: 1;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .watr-bar__links > .watr-bar__group:first-child { padding-left: 0; }
+    .watr-bar__toggle {
+        display: none;
+        font: inherit;
+        font-weight: 600;
+        text-transform: lowercase;
+        min-height: var(--watr-bar-h);
+        padding: 0 5px;
+        margin-right: 15px;
+        border: none;
+        background: none;
+        color: var(--watr-on-bar);
+        cursor: pointer;
+    }
+    .watr-bar__toggle::after { content: " \25BE"; }
+    .watr-bar__toggle[aria-expanded="true"]::after { content: " \25B4"; }
+
+    /* the signed-in person, sitting in the bar */
+    .watr-bar .watr-bar__me { display: inline-flex; align-items: center; gap: 8px; text-transform: none; }
+
+    @media (max-width: 600px) {
+        .watr-bar__toggle[aria-expanded] { display: block; margin-left: auto; }
+        .watr-bar__toggle[aria-expanded="false"] ~ .watr-bar__links { display: none; }
+        .watr-bar__toggle[aria-expanded] ~ .watr-bar__links {
+            flex: none;
+            width: 100%;
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .watr-bar__toggle[aria-expanded] ~ .watr-bar__links .watr-bar__group {
+            flex-direction: column;
+            align-items: stretch;
+            padding: 0;
+        }
+        .watr-bar__toggle[aria-expanded] ~ .watr-bar__links :is(a, button) {
+            display: flex;
+            align-items: center;
+            min-height: 44px;
+            padding: 0 20px;
+            text-align: left;
+            border-top: 1px solid rgb(255 255 255 / 0.2);
+        }
+        .watr-bar__toggle[aria-expanded] ~ .watr-bar__links :is(a, button):hover {
+            text-decoration: none;
+            background-color: rgb(0 0 0 / 0.1);
+        }
+    }
+
+    .watr-footer {
+        color: var(--watr-on-bar);
+        background-color: var(--watr-bar);
+        min-height: var(--watr-foot-h);
+        margin-top: auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        box-shadow: var(--watr-drop-big);
+    }
+
+    /* strips: thin full-width notices stacked right under the bar */
+    .watr-strip {
+        color: #ffffff;
+        background-color: var(--watr-danger);
+        min-height: var(--watr-bar-h);
+        display: flex;
+        align-items: center;
+        padding-inline: 15px;
+        box-shadow: var(--watr-drop);
+        position: relative;
+        z-index: 2;
+    }
+    .watr-strip p { margin: 0; }
+
+    /* the bar and the strips under it are one block: only the bottom of the stack casts */
+    .watr-bar:has(+ .watr-strip),
+    .watr-strip:has(+ .watr-strip) {
+        box-shadow: none;
+    }
+    .watr-strip--warning { background-color: var(--watr-warning); color: var(--watr-ink); }
+    .watr-strip--info    { background-color: var(--watr-bright);  color: var(--watr-ink); }
+
+    /* buttons: square, bright, black text. never rounded */
+    .watr-btn {
+        display: inline-block;
+        font: inherit;
+        background-color: var(--watr-bright);
+        color: var(--watr-ink);
+        text-decoration: none;
+        padding: 10px;
+        border: none;
+        border-radius: 0;
+        cursor: pointer;
+    }
+    .watr-btn:hover { background-color: var(--watr-mid); }
+    .watr-btn:active { transform: translate(1px, 1px); }
+    .watr-btn--danger { background-color: var(--watr-danger); color: #ffffff; }
+    .watr-btn--danger:hover { background-color: color-mix(in oklch, var(--watr-danger), black 20%); }
+    .watr-btn--quiet { background-color: var(--watr-field); color: var(--watr-text); }
+    .watr-btn--quiet:hover { background-color: var(--watr-field-over); }
+    .watr-btn:disabled, .watr-btn[aria-disabled="true"] {
+        background-color: var(--watr-deep);
+        color: color-mix(in oklch, var(--watr-deep), white 60%);
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .watr-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        align-items: center;
+    }
+
+    .watr-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        align-items: flex-start;
+    }
+
+    /* messages: a solid block of signal color, no icon, no border */
+    .watr-msg {
+        padding: 10px;
+        color: #ffffff;
+        background-color: var(--watr-danger);
+    }
+    .watr-msg--warning { background-color: var(--watr-warning); color: var(--watr-ink); }
+    .watr-msg--info    { background-color: var(--watr-bright);  color: var(--watr-ink); }
+
+    /* panel: a raised block that casts the drop */
+    .watr-panel {
+        background-color: var(--watr-panel);
+        box-shadow: var(--watr-drop);
+        padding: 20px;
+    }
+
+    /* split: words on one side, the thing on the other, a thick rule between */
+    .watr-split {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .watr-split__aside {
+        border-right: var(--watr-rule-w) solid var(--watr-rule);
+        padding-right: 40px;
+        text-align: left;
+    }
+    .watr-split__main {
+        padding-left: 40px;
+    }
+
+    @media (max-width: 480px) {
+        .watr-split { flex-direction: column; align-items: stretch; }
+        .watr-split__aside {
+            border-right: none;
+            border-bottom: var(--watr-rule-w) solid var(--watr-rule);
+            padding: 0 0 20px;
+        }
+        .watr-split__main { padding: 20px 0 0; }
+    }
+
+    /* blob: an expressive face sits beside the message, never above it on desktop */
+    .watr-blob {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 35px;
+        text-align: left;
+    }
+    .watr-blob__face {
+        width: 180px;
+        height: auto;
+        flex: none;
+    }
+    @media (max-width: 480px) {
+        .watr-blob { flex-direction: column-reverse; text-align: center; gap: 10px; }
+        .watr-blob .watr-row { justify-content: center; }
+        .watr-blob__face { width: 120px; }
+    }
+
+    /* quote: an in-joke with a fake-official attribution */
+    .watr-quote { margin: 0; }
+    .watr-quote cite {
+        display: block;
+        margin-top: 1em;
+        font-style: italic;
+        font-weight: 700;
+    }
+    .watr-quote cite::before { content: "- "; }
+
+    /* sidebar: slides in from the left, pushes nothing, casts the drop */
+    .watr-sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 4;
+        width: var(--watr-sidebar-w);
+        height: 100%;
+        overflow: hidden;
+        background-color: var(--watr-surface);
+        box-shadow: var(--watr-drop);
+    }
+    .watr-sidebar.is-hidden { width: 0; box-shadow: none; }
+
+    /* modal: dim the page, center the content */
+    .watr-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgb(0 0 0 / 0.4);
+    }
+
+    /* inline emoji images sit on the text baseline */
+    img.watr-emoji {
+        height: 20px;
+        width: 20px;
+        vertical-align: -5px;
+    }
+
+    .watr-center {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        flex: 1;
+        text-align: center;
+    }
+
+    /* ---------- checks and switches: square box, bright when on ---------- */
+    .watr-check, .watr-switch {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+    }
+    .watr-check input, .watr-switch input {
+        appearance: none;
+        flex: none;
+        margin: 0;
+        padding: 0;
+        cursor: pointer;
+        display: grid;
+        place-content: center;
+    }
+    .watr-check input {
+        width: 20px;
+        height: 20px;
+        border-radius: 0;
+        background-color: var(--watr-field);
+    }
+    .watr-check input[type="radio"] { border-radius: 50%; }
+    .watr-check input:checked { background-color: var(--watr-bright); }
+    .watr-check input[type="checkbox"]:checked::before {
+        content: "";
+        width: 10px;
+        height: 5px;
+        border-left: 3px solid var(--watr-ink);
+        border-bottom: 3px solid var(--watr-ink);
+        transform: translateY(-2px) rotate(-45deg);
+    }
+    .watr-check input[type="radio"]:checked::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: var(--watr-ink);
+    }
+    .watr-switch input {
+        position: relative;
+        width: 42px;
+        height: 22px;
+        border-radius: 0;
+        background-color: var(--watr-field-over);
+    }
+    .watr-switch input::before {
+        content: "";
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 16px;
+        height: 16px;
+        background-color: var(--watr-page);
+        box-shadow: 2px 2px 2px var(--watr-shadow-color);
+    }
+    .watr-switch input:checked { background-color: var(--watr-bright); }
+    .watr-switch input:checked::before { left: 23px; }
+    .watr-check input:disabled, .watr-switch input:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* ---------- tabs: sit on a thick bright rule, the active one joins it ---------- */
+    .watr-tabs {
+        display: flex;
+        gap: 5px;
+        overflow-x: auto;           /* too many tabs for a phone? they scroll sideways on one row */
+        scrollbar-width: none;
+        border-bottom: var(--watr-rule-w) solid var(--watr-bright);
+    }
+    .watr-tabs::-webkit-scrollbar { display: none; }
+    .watr-tab {
+        font: inherit;
+        font-weight: 600;
+        text-transform: lowercase;
+        text-decoration: none;
+        padding: 8px 14px;
+        border: none;
+        border-radius: 0;
+        cursor: pointer;
+        background-color: var(--watr-field);
+        color: var(--watr-text);
+        flex: none;
+        white-space: nowrap;
+    }
+    .watr-tab:hover { background-color: var(--watr-field-over); }
+    .watr-tab[aria-selected="true"], .watr-tab[aria-current="page"] {
+        background-color: var(--watr-bright);
+        color: var(--watr-ink);
+    }
+
+    /* ---------- dropdown: a <details> with a menu that drops down-right ---------- */
+    .watr-dropdown { position: relative; display: inline-block; }
+    .watr-dropdown > summary { list-style: none; }
+    .watr-dropdown > summary::-webkit-details-marker { display: none; }
+    .watr-dropdown > summary::after { content: " \25BE"; }
+    .watr-menu {
+        position: absolute;
+        top: calc(100% + 5px);
+        left: 0;
+        z-index: 20;
+        min-width: 180px;
+        display: flex;
+        flex-direction: column;
+        padding-block: 5px;
+        background-color: var(--watr-surface);
+        box-shadow: var(--watr-drop);
+    }
+    .watr-dropdown--right .watr-menu { left: auto; right: 0; }
+    .watr-menu a, .watr-menu button {
+        font: inherit;
+        text-align: left;
+        text-decoration: none;
+        padding: 8px 14px;
+        border: none;
+        background: none;
+        color: var(--watr-text);
+        cursor: pointer;
+    }
+    .watr-menu a:hover, .watr-menu button:hover { background-color: var(--watr-field); }
+    .watr-menu .is-danger { color: var(--watr-danger); }
+    .watr-menu .is-danger:hover { background-color: var(--watr-danger); color: #ffffff; }
+    .watr-menu hr { border: none; border-top: 1px solid var(--watr-field-over); margin: 5px 0; width: 100%; }
+
+    /* ---------- tags: small square labels ---------- */
+    .watr-tag {
+        display: inline-block;
+        font-size: 0.75rem;
+        font-weight: 700;
+        line-height: 1.4;
+        padding: 2px 7px;
+        text-transform: lowercase;
+        white-space: nowrap;
+        background-color: var(--watr-field);
+        color: var(--watr-text);
+    }
+    .watr-tag--bright  { background-color: var(--watr-bright); color: var(--watr-ink); }
+    .watr-tag--deep    { background-color: var(--watr-deep); color: #ffffff; }
+    .watr-tag--danger  { background-color: var(--watr-danger); color: #ffffff; }
+    .watr-tag--warning { background-color: var(--watr-warning); color: var(--watr-ink); }
+
+    /* ---------- avatar: square picture, status is a bar along the bottom edge ---------- */
+    .watr-avatar {
+        position: relative;
+        display: inline-grid;
+        place-content: center;
+        flex: none;
+        width: 48px;
+        height: 48px;
+        font-weight: 800;
+        text-transform: lowercase;
+        overflow: hidden;
+        background-color: var(--watr-deep);
+        color: var(--watr-bright);
+        background-size: cover;
+        background-position: center;
+    }
+    .watr-avatar--small { width: 28px; height: 28px; font-size: 0.75rem; }
+    .watr-avatar--big { width: 120px; height: 120px; font-size: 2.5rem; }
+    .watr-avatar__status {
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        height: max(4px, 12%);
+        background-color: var(--watr-muted);
+    }
+    .watr-avatar__status--online { background-color: var(--watr-bright); }
+    .watr-avatar__status--away   { background-color: var(--watr-warning); }
+    .watr-avatar__status--busy   { background-color: var(--watr-danger); }
+
+    /* ---------- default pictures: a person, or a blob ----------
+       for people with no picture. both are drawn in the site's hue, so they change per site.
+       blobs have six faces. set data-watr-blob="0"-"5" yourself (user id % 6 works), or give
+       the avatar a data-watr-name and watr.js picks one from the name, so the same person
+       always gets the same face. */
+    .watr-avatar--person::before, .watr-avatar--blob::before, .watr-avatar--blob::after {
+        content: "";
+        position: absolute;
+        top: 12%;
+        left: 8%;
+        right: 8%;
+        bottom: calc(max(4px, 12%) + 2px);  /* sits on top of the status bar, never under it */
+        -webkit-mask: var(--watr-face) center / 100% 100% no-repeat;
+        mask: var(--watr-face) center / 100% 100% no-repeat;
+    }
+    .watr-avatar--person::before { --watr-face: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='34' r='20'/%3E%3Cpath d='M10 100C10 74 28 60 50 60C72 60 90 74 90 100Z'/%3E%3C/svg%3E"); background-color: var(--watr-bright); }
+    .watr-avatar--blob::before { --watr-face: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 12C77 12 93 36 95 62C96 76 96 100 96 100H4C4 100 4 76 5 62C7 36 23 12 50 12Z'/%3E%3C/svg%3E"); background-color: var(--watr-bright); }
+    .watr-avatar--blob::after { --watr-face: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='35' cy='50' r='8'/%3E%3Ccircle cx='65' cy='50' r='8'/%3E%3Cpath d='M33 68Q50 84 67 68' stroke='black' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E"); background-color: var(--watr-deep); }
+    .watr-avatar--blob[data-watr-blob="0"]::after { --watr-face: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='35' cy='50' r='8'/%3E%3Ccircle cx='65' cy='50' r='8'/%3E%3Cpath d='M33 68Q50 84 67 68' stroke='black' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E"); }  /* happy */
+    .watr-avatar--blob[data-watr-blob="1"]::after { --watr-face: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='35' cy='50' r='8'/%3E%3Ccircle cx='65' cy='50' r='8'/%3E%3Cellipse cx='50' cy='74' rx='7' ry='9'/%3E%3C/svg%3E"); }  /* surprised */
+    .watr-avatar--blob[data-watr-blob="2"]::after { --watr-face: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M27 52Q35 59 43 52M57 52Q65 59 73 52' stroke='black' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Cpath d='M42 72Q50 77 58 72' stroke='black' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E"); }  /* sleepy */
+    .watr-avatar--blob[data-watr-blob="3"]::after { --watr-face: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='35' cy='50' r='8'/%3E%3Ccircle cx='65' cy='50' r='8'/%3E%3Cpath d='M38 73H62' stroke='black' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E"); }  /* meh */
+    .watr-avatar--blob[data-watr-blob="4"]::after { --watr-face: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='35' cy='50' r='8'/%3E%3Cpath d='M56 51H72' stroke='black' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Cpath d='M33 68Q50 84 67 68' stroke='black' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E"); }  /* wink */
+    .watr-avatar--blob[data-watr-blob="5"]::after { --watr-face: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M27 56L35 46L43 56M57 56L65 46L73 56' stroke='black' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Cpath d='M33 64H67Q67 84 50 84Q33 84 33 64Z'/%3E%3C/svg%3E"); }  /* grin */
+
+    /* ---------- tooltip: add data-watr-tip="text" to anything ---------- */
+    [data-watr-tip] { position: relative; }
+    [data-watr-tip]::after {
+        content: attr(data-watr-tip);
+        position: absolute;
+        left: 0;
+        bottom: calc(100% + 8px);
+        z-index: 30;
+        padding: 5px 8px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        line-height: 1.3;
+        white-space: nowrap;
+        text-transform: none;
+        background-color: var(--watr-text);
+        color: var(--watr-page);
+        box-shadow: var(--watr-drop);
+        opacity: 0;
+        transform: translate(-4px, -4px);
+        pointer-events: none;
+    }
+    /* near the right edge? anchor it there instead */
+    [data-watr-tip-end]::after { left: auto; right: 0; transform: translate(4px, -4px); }
+    [data-watr-tip]:hover::after, [data-watr-tip]:focus-visible::after {
+        opacity: 1;
+        transform: none;
+    }
+
+    /* ---------- progress: flat track, bright fill, no rounding ---------- */
+    progress.watr-progress {
+        appearance: none;
+        width: 100%;
+        height: 10px;
+        border: none;
+        border-radius: 0;
+        background-color: var(--watr-field);
+        color: var(--watr-bright);
+    }
+    progress.watr-progress::-webkit-progress-bar { background-color: var(--watr-field); }
+    progress.watr-progress::-webkit-progress-value { background-color: var(--watr-bright); transition: var(--watr-speed); }
+    progress.watr-progress::-moz-progress-bar { background-color: var(--watr-bright); }
+
+    /* ---------- loading: three squares taking turns ---------- */
+    .watr-loading { display: inline-flex; gap: 5px; vertical-align: middle; }
+    .watr-loading i {
+        width: 10px;
+        height: 10px;
+        background-color: var(--watr-bright);
+        box-shadow: 2px 2px 2px var(--watr-shadow-color);
+        animation: watr-bob 0.6s infinite alternate;
+    }
+    .watr-loading i:nth-child(2) { animation-delay: 0.2s; }
+    .watr-loading i:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes watr-bob { to { transform: translateY(-8px); } }
+    @media (prefers-reduced-motion: reduce) {
+        .watr-loading i { animation: none; }
+        .watr-loading i:nth-child(2) { opacity: 0.6; }
+        .watr-loading i:nth-child(3) { opacity: 0.3; }
+    }
+
+    /* ---------- pagination: square blocks, current page is bright ---------- */
+    .watr-pages { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+    .watr-pages a, .watr-pages span {
+        min-width: 38px;
+        box-sizing: border-box;
+        padding: 8px;
+        text-align: center;
+        text-decoration: none;
+        font-variant-numeric: tabular-nums;
+        background-color: var(--watr-field);
+        color: var(--watr-text);
+    }
+    .watr-pages a:hover { background-color: var(--watr-field-over); }
+    .watr-pages [aria-current="page"] { background-color: var(--watr-bright); color: var(--watr-ink); font-weight: 700; }
+    .watr-pages .is-gap { background: none; min-width: 0; }
+
+    /* ---------- breadcrumbs: lowercase path with slashes ---------- */
+    .watr-crumbs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        font-weight: 600;
+        text-transform: lowercase;
+    }
+    .watr-crumbs li + li::before { content: "/"; margin-right: 6px; font-weight: 400; color: var(--watr-muted); }
+    .watr-crumbs a { color: var(--watr-text); text-decoration: none; }
+    .watr-crumbs a:hover { text-decoration: underline; text-underline-offset: 4px; }
+    .watr-crumbs [aria-current] { color: var(--watr-muted); }
+
+    /* ---------- table: bar-colored header, striped rows, numbers on the right ---------- */
+    .watr-table-wrap {
+        overflow-x: auto;
+        background-color: var(--watr-page);
+        box-shadow: var(--watr-drop);
+    }
+    .watr-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .watr-table th, .watr-table td {
+        padding: 10px 12px;
+        text-align: left;
+        vertical-align: middle;
+    }
+    .watr-table thead th {
+        background-color: var(--watr-bar);
+        color: var(--watr-on-bar);
+        font-weight: 600;
+        text-transform: lowercase;
+        white-space: nowrap;
+    }
+    .watr-table tbody tr:nth-child(even) { background-color: var(--watr-surface); }
+    .watr-table tbody tr:hover { background-color: var(--watr-field); }
+    .watr-table tbody tr.is-selected { background-color: var(--watr-bright); color: var(--watr-ink); }
+    .watr-table .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .watr-table .muted { color: var(--watr-muted); }
+    .watr-table tr.is-selected .muted { color: inherit; }
+    .watr-table tr.is-selected .watr-tag--bright { background-color: var(--watr-ink); color: var(--watr-bright); }
+    .watr-table th button {
+        font: inherit;
+        color: inherit;
+        text-transform: inherit;
+        background: none;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+    }
+    .watr-table th[aria-sort="ascending"] button::after  { content: " \25B4"; }
+    .watr-table th[aria-sort="descending"] button::after { content: " \25BE"; }
+    .watr-table--compact th, .watr-table--compact td { padding: 5px 10px; }
+    .watr-table td.is-main { font-weight: 700; }
+
+    /* --stack: on phones every row turns into a little card.
+       mark the row's title cell .is-main. other cells show their column name, taken from
+       data-label (watr.js fills it in from the header if you leave it out) */
+    @media (max-width: 600px) {
+        .watr-table--stack, .watr-table--stack tbody { display: block; }
+        .watr-table--stack thead { display: none; }
+        .watr-table--stack tr {
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr);
+            column-gap: 10px;
+            align-items: center;
+            padding: 10px 12px;
+        }
+        .watr-table--stack td { padding: 2px 0; }
+        .watr-table--stack td.is-main { grid-column: auto / -1; padding-bottom: 6px; }
+        .watr-table--stack td[data-label]:not(.is-main) {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 15px;
+            text-align: right;
+        }
+        .watr-table--stack td[data-label]:not(.is-main)::before {
+            content: attr(data-label);
+            flex: none;
+            text-align: left;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: lowercase;
+            color: var(--watr-muted);
+        }
+        .watr-table--stack tr.is-selected td::before { color: inherit; }
+    }
+
+    /* ---------- dialog: a little page with its own bar, dropping in from the top-left ---------- */
+    .watr-dialog {
+        box-sizing: border-box;
+        width: min(440px, calc(100vw - 32px));
+        max-height: calc(100vh - 32px);
+        padding: 0;
+        border: none;
+        border-radius: 0;
+        overflow: auto;
+        background-color: var(--watr-page);
+        color: var(--watr-text);
+        box-shadow: var(--watr-drop-big);
+    }
+    dialog.watr-dialog::backdrop { background-color: rgb(0 0 0 / 0.4); }
+    dialog.watr-dialog[open] { animation: watr-drop-in var(--watr-speed) ease-out; }
+    @keyframes watr-drop-in {
+        from { opacity: 0; transform: translate(calc(var(--watr-lift) * -2), calc(var(--watr-lift) * -2)); }
+    }
+    .watr-dialog__head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        min-height: var(--watr-bar-h);
+        padding-inline: 15px;
+        background-color: var(--watr-bar);
+        color: var(--watr-on-bar);
+    }
+    .watr-dialog__head h2 { margin: 0; font-size: 1rem; text-transform: lowercase; }
+    .watr-dialog__close {
+        font: inherit;
+        font-size: 1.4rem;
+        line-height: 1;
+        padding: 0 5px;
+        border: none;
+        background: none;
+        color: inherit;
+        cursor: pointer;
+    }
+    .watr-dialog__body { padding: 20px; line-height: 1.5; }
+    .watr-dialog__body > :first-child { margin-top: 0; }
+    .watr-dialog__body > :last-child { margin-bottom: 0; }
+    .watr-dialog__foot {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 5px;
+        padding: 0 20px 20px;
+    }
+    .watr-dialog--danger .watr-dialog__head { background-color: var(--watr-danger); color: #ffffff; }
+    .watr-dialog--blob .watr-dialog__body { display: flex; align-items: center; gap: 20px; }
+    .watr-dialog--blob .watr-blob__face { width: 90px; }
+
+    /* ---------- toasts: stack in the bottom-right, where the shadows fall ---------- */
+    .watr-toasts {
+        position: fixed;
+        right: 16px;
+        bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 10px;
+        width: min(360px, calc(100vw - 32px));
+        pointer-events: none;
+    }
+    .watr-toast {
+        position: relative;
+        box-sizing: border-box;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 12px 14px 15px;
+        overflow: hidden;
+        pointer-events: auto;
+        background-color: var(--watr-bright);
+        color: var(--watr-ink);
+        box-shadow: var(--watr-drop);
+        animation: watr-slide-in var(--watr-speed) ease-out;
+    }
+    .watr-toast p { margin: 0; flex: 1; min-width: 0; }
+    .watr-toast--plain   { background-color: var(--watr-surface); color: var(--watr-text); }
+    .watr-toast--warning { background-color: var(--watr-warning); color: var(--watr-ink); }
+    .watr-toast--danger  { background-color: var(--watr-danger); color: #ffffff; }
+    .watr-toast.is-leaving { opacity: 0; transform: translateX(20px); }
+    .watr-toast__action {
+        font: inherit;
+        font-weight: 700;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+        text-transform: lowercase;
+        padding: 0;
+        border: none;
+        background: none;
+        color: inherit;
+        cursor: pointer;
+    }
+    .watr-toast__close {
+        font: inherit;
+        font-size: 1.3rem;
+        line-height: 1;
+        padding: 0 3px;
+        border: none;
+        background: none;
+        color: inherit;
+        cursor: pointer;
+    }
+    .watr-toast__timer {
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        height: 4px;
+        background-color: currentColor;
+        opacity: 0.35;
+        transform-origin: left;
+        animation: watr-timer var(--watr-toast-time) linear forwards;
+    }
+    .watr-toast:hover .watr-toast__timer { animation-play-state: paused; }
+    @keyframes watr-slide-in { from { opacity: 0; transform: translateX(20px); } }
+    @keyframes watr-timer { to { transform: scaleX(0); } }
+}
