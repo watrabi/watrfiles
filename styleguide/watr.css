@@ -15,6 +15,7 @@
         --watr-lift: 5px;         /* how far things float. 3px flat, 5px normal, 8px dramatic */
         --watr-head-weight: 700;  /* heading weight. 500 calm, 700 normal, 900 shouty */
         --watr-speed: 0.2s;       /* everything moves at this speed */
+        --watr-toast-time: 4s;    /* how long a toast stays up */
     }
 
     /* ---------- derived: don't edit these, edit the knobs ---------- */
@@ -66,8 +67,7 @@
             --watr-muted:      oklch(74% 0.012 var(--watr-hue));
             --watr-bar:        oklch(50% calc(0.09 * var(--watr-chroma)) var(--watr-hue));
             --watr-shadow-color: rgb(0 0 0 / 0.55);
-            color-scheme: dark;
-        }
+            }
     }
     :root[data-theme="dark"], :root[data-theme="dark"] .watr-scope {
         --watr-page:       oklch(19% 0.012 var(--watr-hue));
@@ -79,9 +79,24 @@
         --watr-muted:      oklch(74% 0.012 var(--watr-hue));
         --watr-bar:        oklch(50% calc(0.09 * var(--watr-chroma)) var(--watr-hue));
         --watr-shadow-color: rgb(0 0 0 / 0.55);
-        color-scheme: dark;
     }
 }
+
+/* ---------- page: outside the layers on purpose ----------
+   resets (normalize.css, a host's base styles) are usually unlayered, and an
+   unlayered rule always beats a layered one, so the page background, text and
+   font would get stuck on the reset's values. these few live out here instead.
+   anything you write after watr.css still wins. */
+body {
+    font: 1rem/normal var(--watr-font);
+    background-color: var(--watr-page);
+    color: var(--watr-text);
+}
+:root { color-scheme: light; }
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { color-scheme: dark; }
+}
+:root[data-theme="dark"] { color-scheme: dark; }
 
 /* ---------- base ---------- */
 @layer watr.base {
@@ -100,9 +115,6 @@
     }
 
     body {
-        font-family: var(--watr-font);
-        background-color: var(--watr-page);
-        color: var(--watr-text);
         display: flex;
         flex-direction: column;
     }
@@ -202,6 +214,12 @@
         z-index: 2;
     }
     .watr-strip p { margin: 0; }
+
+    /* the bar and the strips under it are one block: only the bottom of the stack casts */
+    .watr-bar:has(+ .watr-strip),
+    .watr-strip:has(+ .watr-strip) {
+        box-shadow: none;
+    }
     .watr-strip--warning { background-color: var(--watr-warning); color: var(--watr-ink); }
     .watr-strip--info    { background-color: var(--watr-bright);  color: var(--watr-ink); }
 
@@ -354,4 +372,429 @@
         flex: 1;
         text-align: center;
     }
+
+    /* ---------- checks and switches: square box, bright when on ---------- */
+    .watr-check, .watr-switch {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+    }
+    .watr-check input, .watr-switch input {
+        appearance: none;
+        flex: none;
+        margin: 0;
+        padding: 0;
+        cursor: pointer;
+        display: grid;
+        place-content: center;
+    }
+    .watr-check input {
+        width: 20px;
+        height: 20px;
+        border-radius: 0;
+        background-color: var(--watr-field);
+    }
+    .watr-check input[type="radio"] { border-radius: 50%; }
+    .watr-check input:checked { background-color: var(--watr-bright); }
+    .watr-check input[type="checkbox"]:checked::before {
+        content: "";
+        width: 10px;
+        height: 5px;
+        border-left: 3px solid var(--watr-ink);
+        border-bottom: 3px solid var(--watr-ink);
+        transform: translateY(-2px) rotate(-45deg);
+    }
+    .watr-check input[type="radio"]:checked::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: var(--watr-ink);
+    }
+    .watr-switch input {
+        position: relative;
+        width: 42px;
+        height: 22px;
+        border-radius: 0;
+        background-color: var(--watr-field-over);
+    }
+    .watr-switch input::before {
+        content: "";
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 16px;
+        height: 16px;
+        background-color: var(--watr-page);
+        box-shadow: 2px 2px 2px var(--watr-shadow-color);
+    }
+    .watr-switch input:checked { background-color: var(--watr-bright); }
+    .watr-switch input:checked::before { left: 23px; }
+    .watr-check input:disabled, .watr-switch input:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* ---------- tabs: sit on a thick bright rule, the active one joins it ---------- */
+    .watr-tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        border-bottom: var(--watr-rule-w) solid var(--watr-bright);
+    }
+    .watr-tab {
+        font: inherit;
+        font-weight: 600;
+        text-transform: lowercase;
+        text-decoration: none;
+        padding: 8px 14px;
+        border: none;
+        border-radius: 0;
+        cursor: pointer;
+        background-color: var(--watr-field);
+        color: var(--watr-text);
+    }
+    .watr-tab:hover { background-color: var(--watr-field-over); }
+    .watr-tab[aria-selected="true"], .watr-tab[aria-current="page"] {
+        background-color: var(--watr-bright);
+        color: var(--watr-ink);
+    }
+
+    /* ---------- dropdown: a <details> with a menu that drops down-right ---------- */
+    .watr-dropdown { position: relative; display: inline-block; }
+    .watr-dropdown > summary { list-style: none; }
+    .watr-dropdown > summary::-webkit-details-marker { display: none; }
+    .watr-dropdown > summary::after { content: " \25BE"; }
+    .watr-menu {
+        position: absolute;
+        top: calc(100% + 5px);
+        left: 0;
+        z-index: 20;
+        min-width: 180px;
+        display: flex;
+        flex-direction: column;
+        padding-block: 5px;
+        background-color: var(--watr-surface);
+        box-shadow: var(--watr-drop);
+    }
+    .watr-dropdown--right .watr-menu { left: auto; right: 0; }
+    .watr-menu a, .watr-menu button {
+        font: inherit;
+        text-align: left;
+        text-decoration: none;
+        padding: 8px 14px;
+        border: none;
+        background: none;
+        color: var(--watr-text);
+        cursor: pointer;
+    }
+    .watr-menu a:hover, .watr-menu button:hover { background-color: var(--watr-field); }
+    .watr-menu .is-danger { color: var(--watr-danger); }
+    .watr-menu .is-danger:hover { background-color: var(--watr-danger); color: #ffffff; }
+    .watr-menu hr { border: none; border-top: 1px solid var(--watr-field-over); margin: 5px 0; width: 100%; }
+
+    /* ---------- tags: small square labels ---------- */
+    .watr-tag {
+        display: inline-block;
+        font-size: 0.75rem;
+        font-weight: 700;
+        line-height: 1.4;
+        padding: 2px 7px;
+        text-transform: lowercase;
+        white-space: nowrap;
+        background-color: var(--watr-field);
+        color: var(--watr-text);
+    }
+    .watr-tag--bright  { background-color: var(--watr-bright); color: var(--watr-ink); }
+    .watr-tag--deep    { background-color: var(--watr-deep); color: #ffffff; }
+    .watr-tag--danger  { background-color: var(--watr-danger); color: #ffffff; }
+    .watr-tag--warning { background-color: var(--watr-warning); color: var(--watr-ink); }
+
+    /* ---------- avatar: square picture, round status dot poking out the top-right ---------- */
+    .watr-avatar {
+        position: relative;
+        display: inline-grid;
+        place-content: center;
+        flex: none;
+        width: 48px;
+        height: 48px;
+        font-weight: 800;
+        text-transform: lowercase;
+        background-color: var(--watr-bright);
+        color: var(--watr-ink);
+        background-size: cover;
+        background-position: center;
+    }
+    .watr-avatar--small { width: 28px; height: 28px; font-size: 0.75rem; }
+    .watr-avatar--big { width: 120px; height: 120px; font-size: 2.5rem; }
+    .watr-avatar__status {
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 30%;
+        aspect-ratio: 1;
+        min-width: 10px;
+        border-radius: 50%;
+        border: 2px solid var(--watr-page);
+        transform: translate(40%, -40%);
+        background-color: var(--watr-muted);
+    }
+    .watr-avatar__status--online { background-color: var(--watr-bright); }
+    .watr-avatar__status--away   { background-color: var(--watr-warning); }
+    .watr-avatar__status--busy   { background-color: var(--watr-danger); }
+
+    /* ---------- tooltip: add data-watr-tip="text" to anything ---------- */
+    [data-watr-tip] { position: relative; }
+    [data-watr-tip]::after {
+        content: attr(data-watr-tip);
+        position: absolute;
+        left: 0;
+        bottom: calc(100% + 8px);
+        z-index: 30;
+        padding: 5px 8px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        line-height: 1.3;
+        white-space: nowrap;
+        text-transform: none;
+        background-color: var(--watr-text);
+        color: var(--watr-page);
+        box-shadow: var(--watr-drop);
+        opacity: 0;
+        transform: translate(-4px, -4px);
+        pointer-events: none;
+    }
+    /* near the right edge? anchor it there instead */
+    [data-watr-tip-end]::after { left: auto; right: 0; transform: translate(4px, -4px); }
+    [data-watr-tip]:hover::after, [data-watr-tip]:focus-visible::after {
+        opacity: 1;
+        transform: none;
+    }
+
+    /* ---------- progress: flat track, bright fill, no rounding ---------- */
+    progress.watr-progress {
+        appearance: none;
+        width: 100%;
+        height: 10px;
+        border: none;
+        border-radius: 0;
+        background-color: var(--watr-field);
+        color: var(--watr-bright);
+    }
+    progress.watr-progress::-webkit-progress-bar { background-color: var(--watr-field); }
+    progress.watr-progress::-webkit-progress-value { background-color: var(--watr-bright); transition: var(--watr-speed); }
+    progress.watr-progress::-moz-progress-bar { background-color: var(--watr-bright); }
+
+    /* ---------- loading: three squares taking turns ---------- */
+    .watr-loading { display: inline-flex; gap: 5px; vertical-align: middle; }
+    .watr-loading i {
+        width: 10px;
+        height: 10px;
+        background-color: var(--watr-bright);
+        box-shadow: 2px 2px 2px var(--watr-shadow-color);
+        animation: watr-bob 0.6s infinite alternate;
+    }
+    .watr-loading i:nth-child(2) { animation-delay: 0.2s; }
+    .watr-loading i:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes watr-bob { to { transform: translateY(-8px); } }
+    @media (prefers-reduced-motion: reduce) {
+        .watr-loading i { animation: none; }
+        .watr-loading i:nth-child(2) { opacity: 0.6; }
+        .watr-loading i:nth-child(3) { opacity: 0.3; }
+    }
+
+    /* ---------- pagination: square blocks, current page is bright ---------- */
+    .watr-pages { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+    .watr-pages a, .watr-pages span {
+        min-width: 38px;
+        box-sizing: border-box;
+        padding: 8px;
+        text-align: center;
+        text-decoration: none;
+        font-variant-numeric: tabular-nums;
+        background-color: var(--watr-field);
+        color: var(--watr-text);
+    }
+    .watr-pages a:hover { background-color: var(--watr-field-over); }
+    .watr-pages [aria-current="page"] { background-color: var(--watr-bright); color: var(--watr-ink); font-weight: 700; }
+    .watr-pages .is-gap { background: none; min-width: 0; }
+
+    /* ---------- breadcrumbs: lowercase path with slashes ---------- */
+    .watr-crumbs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        font-weight: 600;
+        text-transform: lowercase;
+    }
+    .watr-crumbs li + li::before { content: "/"; margin-right: 6px; font-weight: 400; color: var(--watr-muted); }
+    .watr-crumbs a { color: var(--watr-text); text-decoration: none; }
+    .watr-crumbs a:hover { text-decoration: underline; text-underline-offset: 4px; }
+    .watr-crumbs [aria-current] { color: var(--watr-muted); }
+
+    /* ---------- table: bar-colored header, striped rows, numbers on the right ---------- */
+    .watr-table-wrap {
+        overflow-x: auto;
+        background-color: var(--watr-page);
+        box-shadow: var(--watr-drop);
+    }
+    .watr-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .watr-table th, .watr-table td {
+        padding: 10px 12px;
+        text-align: left;
+        vertical-align: middle;
+    }
+    .watr-table thead th {
+        background-color: var(--watr-bar);
+        color: var(--watr-on-bar);
+        font-weight: 600;
+        text-transform: lowercase;
+        white-space: nowrap;
+    }
+    .watr-table tbody tr:nth-child(even) { background-color: var(--watr-surface); }
+    .watr-table tbody tr:hover { background-color: var(--watr-field); }
+    .watr-table tbody tr.is-selected { background-color: var(--watr-bright); color: var(--watr-ink); }
+    .watr-table .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .watr-table .muted { color: var(--watr-muted); }
+    .watr-table tr.is-selected .muted { color: inherit; }
+    .watr-table tr.is-selected .watr-tag--bright { background-color: var(--watr-ink); color: var(--watr-bright); }
+    .watr-table th button {
+        font: inherit;
+        color: inherit;
+        text-transform: inherit;
+        background: none;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+    }
+    .watr-table th[aria-sort="ascending"] button::after  { content: " \25B4"; }
+    .watr-table th[aria-sort="descending"] button::after { content: " \25BE"; }
+    .watr-table--compact th, .watr-table--compact td { padding: 5px 10px; }
+
+    /* ---------- dialog: a little page with its own bar, dropping in from the top-left ---------- */
+    .watr-dialog {
+        box-sizing: border-box;
+        width: min(440px, calc(100vw - 32px));
+        max-height: calc(100vh - 32px);
+        padding: 0;
+        border: none;
+        border-radius: 0;
+        overflow: auto;
+        background-color: var(--watr-page);
+        color: var(--watr-text);
+        box-shadow: var(--watr-drop-big);
+    }
+    dialog.watr-dialog::backdrop { background-color: rgb(0 0 0 / 0.4); }
+    dialog.watr-dialog[open] { animation: watr-drop-in var(--watr-speed) ease-out; }
+    @keyframes watr-drop-in {
+        from { opacity: 0; transform: translate(calc(var(--watr-lift) * -2), calc(var(--watr-lift) * -2)); }
+    }
+    .watr-dialog__head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        min-height: var(--watr-bar-h);
+        padding-inline: 15px;
+        background-color: var(--watr-bar);
+        color: var(--watr-on-bar);
+    }
+    .watr-dialog__head h2 { margin: 0; font-size: 1rem; text-transform: lowercase; }
+    .watr-dialog__close {
+        font: inherit;
+        font-size: 1.4rem;
+        line-height: 1;
+        padding: 0 5px;
+        border: none;
+        background: none;
+        color: inherit;
+        cursor: pointer;
+    }
+    .watr-dialog__body { padding: 20px; line-height: 1.5; }
+    .watr-dialog__body > :first-child { margin-top: 0; }
+    .watr-dialog__body > :last-child { margin-bottom: 0; }
+    .watr-dialog__foot {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 5px;
+        padding: 0 20px 20px;
+    }
+    .watr-dialog--danger .watr-dialog__head { background-color: var(--watr-danger); color: #ffffff; }
+    .watr-dialog--blob .watr-dialog__body { display: flex; align-items: center; gap: 20px; }
+    .watr-dialog--blob .watr-blob__face { width: 90px; }
+
+    /* ---------- toasts: stack in the bottom-right, where the shadows fall ---------- */
+    .watr-toasts {
+        position: fixed;
+        right: 16px;
+        bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 10px;
+        width: min(360px, calc(100vw - 32px));
+        pointer-events: none;
+    }
+    .watr-toast {
+        position: relative;
+        box-sizing: border-box;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 12px 14px 15px;
+        overflow: hidden;
+        pointer-events: auto;
+        background-color: var(--watr-bright);
+        color: var(--watr-ink);
+        box-shadow: var(--watr-drop);
+        animation: watr-slide-in var(--watr-speed) ease-out;
+    }
+    .watr-toast p { margin: 0; flex: 1; min-width: 0; }
+    .watr-toast--plain   { background-color: var(--watr-surface); color: var(--watr-text); }
+    .watr-toast--warning { background-color: var(--watr-warning); color: var(--watr-ink); }
+    .watr-toast--danger  { background-color: var(--watr-danger); color: #ffffff; }
+    .watr-toast.is-leaving { opacity: 0; transform: translateX(20px); }
+    .watr-toast__action {
+        font: inherit;
+        font-weight: 700;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+        text-transform: lowercase;
+        padding: 0;
+        border: none;
+        background: none;
+        color: inherit;
+        cursor: pointer;
+    }
+    .watr-toast__close {
+        font: inherit;
+        font-size: 1.3rem;
+        line-height: 1;
+        padding: 0 3px;
+        border: none;
+        background: none;
+        color: inherit;
+        cursor: pointer;
+    }
+    .watr-toast__timer {
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        height: 4px;
+        background-color: currentColor;
+        opacity: 0.35;
+        transform-origin: left;
+        animation: watr-timer var(--watr-toast-time) linear forwards;
+    }
+    .watr-toast:hover .watr-toast__timer { animation-play-state: paused; }
+    @keyframes watr-slide-in { from { opacity: 0; transform: translateX(20px); } }
+    @keyframes watr-timer { to { transform: scaleX(0); } }
 }

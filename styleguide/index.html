@@ -53,7 +53,7 @@
     .sig__demo { height: 120px; background-color: var(--watr-surface); display: flex; align-items: center; justify-content: center; gap: 10px; overflow: hidden; position: relative; }
     .mini-page { width: 150px; height: 96px; background-color: var(--watr-page); display: flex; flex-direction: column; box-shadow: var(--watr-drop); }
     .mini-page i { display: block; }
-    .mini-page .b { height: 12px; background-color: var(--watr-bar); box-shadow: 2px 2px 2px var(--watr-shadow-color); position: relative; z-index: 2; }
+    .mini-page .b { height: 12px; background-color: var(--watr-bar); }
     .mini-page .s { height: 7px; background-color: var(--watr-danger); box-shadow: 2px 2px 2px var(--watr-shadow-color); position: relative; z-index: 1; }
     .mini-page .f { height: 12px; margin-top: auto; background-color: var(--watr-bar); }
     .mini-page .l { height: 4px; width: 60%; margin: 10px 0 0 12px; background-color: var(--watr-field-over); }
@@ -73,7 +73,7 @@
     .voice-demo b { display: block; }
 
     /* parts */
-    .parts { display: grid; gap: 35px; margin-top: 20px; }
+    .parts { display: grid; grid-template-columns: minmax(0, 1fr); gap: 35px; margin-top: 20px; }
     .part > h3 { margin: 0 0 10px; font-size: 1rem; }
     .part > h3 code { font-weight: 400; margin-left: 6px; }
     .stage { background-color: var(--watr-page); outline: 1px dashed var(--watr-field-over); outline-offset: 0; padding: 25px; }
@@ -96,12 +96,47 @@
     .recipe li { margin-bottom: 8px; }
     .recipe li::marker { font-weight: 800; color: var(--watr-mid); }
 
+    /* new parts */
+    [hidden] { display: none !important; }
+    .note { margin: 0; color: var(--watr-muted); max-width: 52ch; line-height: 1.5; }
+    .checks { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 25px; }
+    .checks .watr-stack { gap: 12px; }
+    .stage--dim {
+        background-color: color-mix(in oklch, var(--watr-page), black 45%);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 25px;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 30px 16px;
+    }
+    .stage--dim .watr-dialog { width: min(330px, 100%); }
+    .toast-demo { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 360px); gap: 25px; align-items: end; }
+    .stage .watr-toasts[data-watr-static] { position: static; width: 100%; }
+    .small-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 30px; }
+    .small-grid h4 { margin: 0 0 12px; font-size: 0.85rem; color: var(--watr-muted); }
+    .small-grid .watr-row { gap: 8px; }
+    .user-cell { display: flex; align-items: center; gap: 12px; font-weight: 600; }
+    .field-label { display: block; font-weight: 600; margin-bottom: 6px; }
+    .dialog-input { width: 100%; box-sizing: border-box; }
+
+    /* mockup */
+    .mock__body { padding: 20px; display: flex; flex-direction: column; gap: 18px; }
+    .mock__head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; }
+    .mock__head h1 { margin: 0; }
+    .mock__upload { display: grid; grid-template-columns: auto minmax(0, 1fr) 3rem; gap: 12px; align-items: center; font-size: 0.9rem; }
+    .mock__upload output { text-align: right; font-variant-numeric: tabular-nums; }
+    .mock__foot { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; color: var(--watr-muted); font-size: 0.9rem; }
+    .mock .watr-avatar { margin-left: 6px; }
+    .mock .watr-table td:first-child, .mock .watr-table th:first-child { width: 20px; padding-right: 0; }
+
     .theme-btn { font: inherit; font-weight: 600; background: none; border: none; color: var(--watr-on-bar); cursor: pointer; padding: 5px; text-transform: lowercase; }
     .theme-btn:hover { text-decoration: underline; text-underline-offset: 4px; }
 
     @media (max-width: 760px) {
         .tuner { grid-template-columns: minmax(0, 1fr); }
         .ramp { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .toast-demo { grid-template-columns: minmax(0, 1fr); }
     }
 </style>
 </head>
@@ -113,6 +148,7 @@
         <a href="#knobs">knobs</a>
         <a href="#keep">keep</a>
         <a href="#parts">parts</a>
+        <a href="#mockup">mockup</a>
         <a href="#voice">voice</a>
         <a href="#new-site">new site</a>
     </div>
@@ -121,7 +157,7 @@
     </div>
 </nav>
 <div class="watr-strip watr-strip--warning">
-    <p>This guide is incomplete! It's version 0.1, keep poking at it.</p>
+    <p>This guide is incomplete! It's version 0.2, keep poking at it.</p>
 </div>
 
 <main class="page" id="top">
@@ -216,7 +252,7 @@
             <div class="sig">
                 <div class="sig__demo"><div class="mini-page"><i class="b"></i><i class="s"></i><i class="l"></i><i class="l"></i><i class="f"></i></div></div>
                 <h3>framed by bars</h3>
-                <p>A full-width bar on top, optional notice strips stacked under it, a bar at the bottom. Each one casts onto the next.</p>
+                <p>A full-width bar on top, optional notice strips stacked under it, a bar at the bottom. The bar and its strips are one block, so only the bottom of the stack casts a shadow.</p>
             </div>
             <div class="sig">
                 <div class="sig__demo"><div class="rule-demo"><div><b>login</b><br>the watr files</div><div><span></span><span></span><span></span></div></div></div>
@@ -282,11 +318,170 @@
             </div>
 
             <div class="part">
+                <h3>checks and switches <code>.watr-check .watr-switch</code></h3>
+                <div class="stage checks">
+                    <div class="watr-stack">
+                        <label class="watr-check"><input type="checkbox" id="c-public" checked> public link</label>
+                        <label class="watr-check"><input type="checkbox" id="c-downloads"> allow downloads</label>
+                        <label class="watr-check"><input type="checkbox" id="c-scan" disabled> virus scan (soon)</label>
+                    </div>
+                    <div class="watr-stack" role="radiogroup" aria-label="sort files by">
+                        <label class="watr-check"><input type="radio" name="sort" id="r-new" checked> newest first</label>
+                        <label class="watr-check"><input type="radio" name="sort" id="r-big"> biggest first</label>
+                        <label class="watr-check"><input type="radio" name="sort" id="r-az"> a to z</label>
+                    </div>
+                    <div class="watr-stack">
+                        <label class="watr-switch"><input type="checkbox" role="switch" id="s-email" checked> email me when someone shares</label>
+                        <label class="watr-switch"><input type="checkbox" role="switch" id="s-hidden"> show hidden files</label>
+                        <select id="sel-keep" aria-label="keep files for">
+                            <option>keep files forever</option>
+                            <option>delete after 30 days</option>
+                            <option>delete after a year</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="part">
+                <h3>tabs and dropdowns <code>.watr-tabs .watr-dropdown .watr-menu</code></h3>
+                <div class="stage watr-stack" style="gap: 25px; align-items: stretch;">
+                    <div class="watr-tabs" role="tablist" aria-label="file filters">
+                        <button type="button" class="watr-tab" role="tab" aria-selected="true">all files</button>
+                        <button type="button" class="watr-tab" role="tab" aria-selected="false">mine</button>
+                        <button type="button" class="watr-tab" role="tab" aria-selected="false">shared with me</button>
+                        <button type="button" class="watr-tab" role="tab" aria-selected="false">trash</button>
+                    </div>
+                    <div style="min-height: 200px;">
+                        <details class="watr-dropdown" open>
+                            <summary class="watr-btn">more</summary>
+                            <div class="watr-menu">
+                                <a href="#">rename</a>
+                                <a href="#">move to...</a>
+                                <a href="#">copy link</a>
+                                <hr>
+                                <button type="button" class="is-danger">delete</button>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+            </div>
+
+            <div class="part">
                 <h3>messages <code>.watr-msg</code></h3>
                 <div class="stage watr-stack" style="align-items: stretch;">
                     <div class="watr-msg">Your passwords do not match.</div>
                     <div class="watr-msg watr-msg--warning">This file is over 50 MB and will take a while.</div>
                     <div class="watr-msg watr-msg--info">Saved. Your profile is up to date.</div>
+                </div>
+            </div>
+
+            <div class="part">
+                <h3>toasts <code>.watr-toast</code> <code>watr.toast()</code></h3>
+                <div class="stage toast-demo">
+                    <div class="watr-stack" style="gap: 15px;">
+                        <p class="note">They stack in the bottom-right corner, where the shadows fall. The line along the bottom is the timer: hover a toast to pause it. Danger toasts stay until you close them.</p>
+                        <div class="watr-row">
+                            <button type="button" class="watr-btn" id="t-info">Upload</button>
+                            <button type="button" class="watr-btn watr-btn--quiet" id="t-plain">Copy link</button>
+                            <button type="button" class="watr-btn watr-btn--quiet" id="t-warn">Fill storage</button>
+                            <button type="button" class="watr-btn watr-btn--danger" id="t-danger">Break an upload</button>
+                        </div>
+                    </div>
+                    <div class="watr-toasts" data-watr-static>
+                        <div class="watr-toast"><p>Uploaded backup.zip</p><button type="button" class="watr-toast__action">undo</button><button type="button" class="watr-toast__close" aria-label="dismiss">&times;</button><i class="watr-toast__timer" style="animation: none; transform: scaleX(0.6);"></i></div>
+                        <div class="watr-toast watr-toast--plain"><p>Link copied</p><button type="button" class="watr-toast__close" aria-label="dismiss">&times;</button><i class="watr-toast__timer" style="animation: none; transform: scaleX(0.3);"></i></div>
+                        <div class="watr-toast watr-toast--warning"><p>You've used 90% of your storage.</p><button type="button" class="watr-toast__close" aria-label="dismiss">&times;</button><i class="watr-toast__timer" style="animation: none; transform: scaleX(0.8);"></i></div>
+                        <div class="watr-toast watr-toast--danger"><p>Upload failed. The file is over 2 GB.</p><button type="button" class="watr-toast__action">retry</button><button type="button" class="watr-toast__close" aria-label="dismiss">&times;</button></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="part">
+                <h3>modals <code>.watr-dialog</code> <code>--danger</code> <code>--blob</code></h3>
+                <div class="stage stage--dim" id="dialog-stage" aria-label="modal examples"></div>
+                <div class="watr-row" style="margin-top: 15px;">
+                    <button type="button" class="watr-btn" data-watr-open="dlg-rename">Open rename</button>
+                    <button type="button" class="watr-btn watr-btn--danger" data-watr-open="dlg-delete">Open delete</button>
+                    <button type="button" class="watr-btn watr-btn--quiet" data-watr-open="dlg-expired">Open logged out</button>
+                </div>
+            </div>
+
+            <div class="part">
+                <h3>table <code>.watr-table</code> <code>--compact</code></h3>
+                <div class="watr-table-wrap">
+                    <table class="watr-table watr-table--compact">
+                        <thead><tr>
+                            <th aria-sort="ascending"><button type="button">user</button></th>
+                            <th>role</th>
+                            <th class="num"><button type="button">files</button></th>
+                            <th class="num"><button type="button">joined</button></th>
+                        </tr></thead>
+                        <tbody>
+                        <tr><td data-sort="sword"><span class="user-cell"><span class="watr-avatar watr-avatar--small">sw<i class="watr-avatar__status watr-avatar__status--online"></i></span>sword</span></td><td><span class="watr-tag watr-tag--deep">admin</span></td><td class="num">214</td><td class="num">2025-03-14</td></tr>
+                        <tr><td data-sort="watrboi"><span class="user-cell"><span class="watr-avatar watr-avatar--small">wb<i class="watr-avatar__status watr-avatar__status--away"></i></span>watrboi</span></td><td><span class="watr-tag watr-tag--deep">admin</span></td><td class="num">1,032</td><td class="num">2024-11-02</td></tr>
+                        <tr><td data-sort="bubbles"><span class="user-cell"><span class="watr-avatar watr-avatar--small">bu<i class="watr-avatar__status watr-avatar__status--online"></i></span>bubbles</span></td><td><span class="watr-tag">member</span></td><td class="num">87</td><td class="num">2026-01-18</td></tr>
+                        <tr><td data-sort="centipede"><span class="user-cell"><span class="watr-avatar watr-avatar--small">ce<i class="watr-avatar__status watr-avatar__status--busy"></i></span>centipede</span></td><td><span class="watr-tag">member</span></td><td class="num">12</td><td class="num">2026-09-30</td></tr>
+                        <tr><td data-sort="lurker"><span class="user-cell"><span class="watr-avatar watr-avatar--small">lu<i class="watr-avatar__status"></i></span>lurker</span></td><td><span class="watr-tag watr-tag--danger">banned</span></td><td class="num">0</td><td class="num">2026-05-05</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="note" style="margin-top: 10px;">Click a header to sort. The full-size table is in the mockup below.</p>
+            </div>
+
+            <div class="part">
+                <h3>small stuff <code>.watr-tag .watr-avatar .watr-crumbs .watr-pages .watr-progress .watr-loading [data-watr-tip]</code></h3>
+                <div class="stage small-grid">
+                    <div>
+                        <h4>tags</h4>
+                        <div class="watr-row">
+                            <span class="watr-tag watr-tag--bright">public</span>
+                            <span class="watr-tag">private</span>
+                            <span class="watr-tag watr-tag--deep">admin</span>
+                            <span class="watr-tag watr-tag--warning">expires friday</span>
+                            <span class="watr-tag watr-tag--danger">banned</span>
+                        </div>
+                    </div>
+                    <div>
+                        <h4>avatars and status</h4>
+                        <div class="watr-row" style="gap: 22px; align-items: flex-end;">
+                            <span class="watr-avatar watr-avatar--big">sw<i class="watr-avatar__status watr-avatar__status--online"></i></span>
+                            <span class="watr-avatar">wb<i class="watr-avatar__status watr-avatar__status--away"></i></span>
+                            <span class="watr-avatar watr-avatar--small">ce<i class="watr-avatar__status watr-avatar__status--busy"></i></span>
+                            <span class="watr-avatar watr-avatar--small">lu<i class="watr-avatar__status"></i></span>
+                        </div>
+                    </div>
+                    <div>
+                        <h4>breadcrumbs</h4>
+                        <ol class="watr-crumbs">
+                            <li><a href="#">files</a></li>
+                            <li><a href="#">backups</a></li>
+                            <li aria-current="page">2026</li>
+                        </ol>
+                    </div>
+                    <div>
+                        <h4>pagination</h4>
+                        <nav class="watr-pages" aria-label="pages">
+                            <a href="#" aria-label="previous page">&lsaquo;</a>
+                            <a href="#">1</a>
+                            <span aria-current="page">2</span>
+                            <a href="#">3</a>
+                            <span class="is-gap">&hellip;</span>
+                            <a href="#">12</a>
+                            <a href="#" aria-label="next page">&rsaquo;</a>
+                        </nav>
+                    </div>
+                    <div>
+                        <h4>progress</h4>
+                        <progress class="watr-progress" value="62" max="100" aria-label="upload progress"></progress>
+                        <p class="note" style="margin-top: 6px;">uploading old-site.tar.gz, 62%</p>
+                    </div>
+                    <div>
+                        <h4>loading and tooltip</h4>
+                        <div class="watr-row" style="gap: 20px;">
+                            <span class="watr-loading" role="status" aria-label="loading"><i></i><i></i><i></i></span>
+                            <button type="button" class="watr-btn watr-btn--quiet" data-watr-tip="Anyone with the link can download">copy link</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -342,6 +537,87 @@
         </div>
     </section>
 
+    <section id="mockup">
+        <h2>mockup</h2>
+        <p class="lede">A watrfiles page made only from the parts above. It works: switch tabs, sort the columns, tick rows, try Upload, or use the more menu.</p>
+
+        <div class="stage stage--flush mock">
+            <div class="watr-bar">
+                <div class="watr-bar__group"><a href="#" class="watr-bar__home">watrfiles</a><a href="#">home</a><a href="#">files</a></div>
+                <div class="watr-bar__group"><a href="#">accounts</a><span class="watr-avatar watr-avatar--small" data-watr-tip="sword, online" data-watr-tip-end>sw<i class="watr-avatar__status watr-avatar__status--online"></i></span></div>
+            </div>
+            <div class="watr-strip"><p>This site is incomplete!</p></div>
+
+            <div class="mock__body">
+                <ol class="watr-crumbs">
+                    <li><a href="#">files</a></li>
+                    <li aria-current="page">backups</li>
+                </ol>
+
+                <div class="mock__head">
+                    <h1>backups</h1>
+                    <div class="watr-row">
+                        <button type="button" class="watr-btn" id="mock-upload">Upload</button>
+                        <details class="watr-dropdown watr-dropdown--right">
+                            <summary class="watr-btn watr-btn--quiet">more</summary>
+                            <div class="watr-menu">
+                                <button type="button" data-watr-open="dlg-rename">rename</button>
+                                <button type="button" id="mock-copy">copy link</button>
+                                <hr>
+                                <button type="button" class="is-danger" data-watr-open="dlg-delete">delete</button>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+
+                <div class="mock__upload" id="mock-progress-row" hidden>
+                    <span>uploading notes-2.txt</span>
+                    <progress class="watr-progress" id="mock-progress" value="0" max="100" aria-label="upload progress"></progress>
+                    <output id="mock-progress-text">0%</output>
+                </div>
+
+                <div class="watr-tabs" role="tablist" aria-label="file filters">
+                    <button type="button" class="watr-tab" role="tab" aria-selected="true">all files</button>
+                    <button type="button" class="watr-tab" role="tab" aria-selected="false">mine</button>
+                    <button type="button" class="watr-tab" role="tab" aria-selected="false">shared with me</button>
+                    <button type="button" class="watr-tab" role="tab" aria-selected="false">trash</button>
+                </div>
+
+                <div class="watr-table-wrap">
+                    <table class="watr-table">
+                        <thead><tr>
+                            <th><label class="watr-check"><input type="checkbox" id="mf-all" aria-label="select all files"></label></th>
+                            <th aria-sort="ascending"><button type="button">name</button></th>
+                            <th class="num"><button type="button">size</button></th>
+                            <th><button type="button">owner</button></th>
+                            <th class="num"><button type="button">uploaded</button></th>
+                            <th>sharing</th>
+                        </tr></thead>
+                        <tbody>
+                                <tr class="is-selected"><td><label class="watr-check"><input type="checkbox" id="mf-0" aria-label="select backup.zip" checked></label></td><td><b>backup.zip</b></td><td class="num" data-sort="13002342">12.4 MB</td><td class="muted">sword</td><td class="num">2026-10-02</td><td><span class="watr-tag watr-tag--bright">public</span></td></tr>
+                                <tr><td><label class="watr-check"><input type="checkbox" id="mf-1" aria-label="select centipede.png"></label></td><td><b>centipede.png</b></td><td class="num" data-sort="860160">840 KB</td><td class="muted">sword</td><td class="num">2026-09-28</td><td><span class="watr-tag">private</span></td></tr>
+                                <tr><td><label class="watr-check"><input type="checkbox" id="mf-2" aria-label="select old-site.tar.gz"></label></td><td><b>old-site.tar.gz</b></td><td class="num" data-sort="163577856">156 MB</td><td class="muted">watrboi</td><td class="num">2026-08-11</td><td><span class="watr-tag watr-tag--bright">public</span></td></tr>
+                                <tr><td><label class="watr-check"><input type="checkbox" id="mf-3" aria-label="select watrlabs-logo.psd"></label></td><td><b>watrlabs-logo.psd</b></td><td class="num" data-sort="24222105">23.1 MB</td><td class="muted">watrboi</td><td class="num">2026-07-30</td><td><span class="watr-tag">private</span></td></tr>
+                                <tr><td><label class="watr-check"><input type="checkbox" id="mf-4" aria-label="select notes.txt"></label></td><td><b>notes.txt</b></td><td class="num" data-sort="2048">2 KB</td><td class="muted">sword</td><td class="num">2026-06-04</td><td><span class="watr-tag watr-tag--warning">expires friday</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mock__foot">
+                    <span>5 files, 192.3 MB</span>
+                    <nav class="watr-pages" aria-label="pages">
+                        <span aria-current="page">1</span>
+                        <a href="#">2</a>
+                        <a href="#">3</a>
+                        <a href="#" aria-label="next page">&rsaquo;</a>
+                    </nav>
+                </div>
+            </div>
+
+            <div class="watr-footer">&copy;watrfiles - 2026</div>
+        </div>
+    </section>
+
     <section id="voice">
         <h2>voice</h2>
         <p class="lede">Lowercase where it's chrome, normal case where it's a sentence. Plain about what happened, a little weird around the edges.</p>
@@ -377,6 +653,45 @@
 
 <footer class="watr-footer">©watr style - 2026</footer>
 
+<dialog class="watr-dialog" id="dlg-rename" aria-labelledby="dlg-rename-title">
+    <form method="dialog">
+        <div class="watr-dialog__head"><h2 id="dlg-rename-title">rename file</h2><button type="button" class="watr-dialog__close" data-watr-close aria-label="close">&times;</button></div>
+        <div class="watr-dialog__body">
+            <label class="field-label" for="rename-input">new name</label>
+            <input class="dialog-input" id="rename-input" value="backup.zip" autocomplete="off">
+        </div>
+        <div class="watr-dialog__foot">
+            <button type="button" class="watr-btn watr-btn--quiet" data-watr-close>Cancel</button>
+            <button type="submit" class="watr-btn" value="rename">Rename</button>
+        </div>
+    </form>
+</dialog>
+
+<dialog class="watr-dialog watr-dialog--danger" id="dlg-delete" aria-labelledby="dlg-delete-title">
+    <form method="dialog">
+        <div class="watr-dialog__head"><h2 id="dlg-delete-title">delete file?</h2><button type="button" class="watr-dialog__close" data-watr-close aria-label="close">&times;</button></div>
+        <div class="watr-dialog__body">
+            <p><b>backup.zip</b> will be gone for good. Anyone with the link loses access too.</p>
+        </div>
+        <div class="watr-dialog__foot">
+            <button type="button" class="watr-btn watr-btn--quiet" data-watr-close>Keep it</button>
+            <button type="submit" class="watr-btn watr-btn--danger" value="delete">Delete file</button>
+        </div>
+    </form>
+</dialog>
+
+<dialog class="watr-dialog watr-dialog--blob" id="dlg-expired" aria-labelledby="dlg-expired-title">
+    <div class="watr-dialog__head"><h2 id="dlg-expired-title">logged out</h2><button type="button" class="watr-dialog__close" data-watr-close aria-label="close">&times;</button></div>
+    <div class="watr-dialog__body">
+        <p>Your session ran out, so you got logged out. The upload you started is saved as a draft.</p>
+        <img class="watr-blob__face" src="assets/blobpanic.png" alt="Screaming face emoji" width="90" height="90">
+    </div>
+    <div class="watr-dialog__foot">
+        <button type="button" class="watr-btn" data-watr-close>Log in again</button>
+    </div>
+</dialog>
+
+<script src="watr.js"></script>
 <script>
     const root = document.documentElement;
     const knobs = {
@@ -457,6 +772,72 @@
         syncThemeLabel();
     });
     window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", syncThemeLabel);
+
+    // demo links go nowhere
+    document.addEventListener("click", function (e) {
+        if (e.target.closest('a[href="#"]')) e.preventDefault();
+    });
+
+    // static copies of the real dialogs, so all three show at once
+    const dialogStage = document.getElementById("dialog-stage");
+    ["dlg-rename", "dlg-delete", "dlg-expired"].forEach(function (id) {
+        const real = document.getElementById(id);
+        const copy = document.createElement("div");
+        copy.className = real.className;
+        copy.innerHTML = real.innerHTML;
+        copy.querySelectorAll("[id]").forEach(function (el) { el.removeAttribute("id"); });
+        copy.querySelectorAll("label[for]").forEach(function (el) { el.removeAttribute("for"); });
+        dialogStage.appendChild(copy);
+    });
+    dialogStage.inert = true;
+
+    document.getElementById("dlg-rename").addEventListener("close", function () {
+        if (this.returnValue !== "rename") return;
+        const name = document.getElementById("rename-input").value.trim() || "backup.zip";
+        watr.toast("Renamed to " + name);
+    });
+    document.getElementById("dlg-delete").addEventListener("close", function () {
+        if (this.returnValue !== "delete") return;
+        watr.toast("Deleted backup.zip", { type: "plain", action: "undo", onAction: function () { watr.toast("backup.zip is back"); } });
+    });
+
+    document.getElementById("t-info").addEventListener("click", function () {
+        watr.toast("Uploaded backup.zip", { action: "undo", onAction: function () { watr.toast("Upload undone", { type: "plain" }); } });
+    });
+    document.getElementById("t-plain").addEventListener("click", function () { watr.toast("Link copied", { type: "plain" }); });
+    document.getElementById("t-warn").addEventListener("click", function () { watr.toast("You've used 90% of your storage.", { type: "warning" }); });
+    document.getElementById("t-danger").addEventListener("click", function () {
+        watr.toast("Upload failed. The file is over 2 GB.", { type: "danger", action: "retry", time: 0, onAction: function () { watr.toast("Trying again", { type: "plain" }); } });
+    });
+
+    // mockup: fake upload, copy link
+    const upButton = document.getElementById("mock-upload");
+    const upRow = document.getElementById("mock-progress-row");
+    const upBar = document.getElementById("mock-progress");
+    const upText = document.getElementById("mock-progress-text");
+    upButton.addEventListener("click", function () {
+        upButton.disabled = true;
+        upRow.hidden = false;
+        upBar.value = 0;
+        const tick = setInterval(function () {
+            upBar.value = Math.min(100, upBar.value + 6 + Math.random() * 10);
+            upText.textContent = Math.round(upBar.value) + "%";
+            if (upBar.value < 100) return;
+            clearInterval(tick);
+            setTimeout(function () {
+                upRow.hidden = true;
+                upButton.disabled = false;
+                watr.toast("Uploaded notes-2.txt", { action: "undo", onAction: function () { watr.toast("Upload undone", { type: "plain" }); } });
+            }, 300);
+        }, 160);
+    });
+    document.getElementById("mock-copy").addEventListener("click", function () {
+        this.closest("details").open = false;
+        watr.toast("Link copied", { type: "plain" });
+    });
+    document.querySelectorAll(".watr-menu [data-watr-open]").forEach(function (b) {
+        b.addEventListener("click", function () { b.closest("details").open = false; });
+    });
 
     render();
     syncThemeLabel();

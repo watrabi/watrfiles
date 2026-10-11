@@ -6,11 +6,12 @@ This folder is self-contained. Copy it into any project.
 
 | file | what it is |
 | --- | --- |
-| `watr.css` | the kit. tokens, base styles and components, all inside `@layer watr` |
-| `index.html` | live guide. open it in a browser, drag the knobs, copy the snippet |
+| `watr.css` | the kit. tokens, base styles and components, inside `@layer watr` |
+| `watr.js` | optional. makes modals, toasts, tabs, table sorting and the sidebar work without writing JS |
+| `index.html` | live guide. open it in a browser, drag the knobs, copy the snippet, click around the mockup |
 | `assets/` | the blobs and the watrlabs icon |
 
-Version 0.1. Taken from watrfiles (`public/assets/base.css`, the login, 404 and 500 pages).
+Version 0.2. Taken from watrfiles (`public/assets/base.css`, the login, 404 and 500 pages).
 
 ---
 
@@ -38,7 +39,7 @@ If two of my sites sat side by side, you should be able to tell they're by the s
 
 2. **Light from the top-left.** Shadows are always offset down and to the right, with x, y and blur equal: `5px 5px 5px rgb(15 15 15 / .4)`. Never a centered glow, never a shadow going up.
 
-3. **Framed by bars.** A full-width bar on top (45px), optional notice strips stacked directly under it (red, yellow, or bright), a bar at the bottom (50px). Each one casts its shadow onto whatever is below it.
+3. **Framed by bars.** A full-width bar on top (45px), optional notice strips stacked directly under it (red, yellow, or bright), a bar at the bottom (50px). The bar and its strips are one block: nothing inside the stack casts a shadow, only the bottom of it does. (The kit handles this with `:has()`, so just put strips straight after the bar.)
 
 4. **Square buttons, soft fields.** Buttons have 0 radius, bright fill, black text, 10px padding, darker on hover. Inputs are filled grey, no border, 0.3em radius. Keep that contrast.
 
@@ -86,7 +87,9 @@ Rules for keeping sites different:
 
 ## parts
 
-All classes start with `watr-`. Everything is inside `@layer watr`, so any normal CSS you write overrides it without `!important`.
+All classes start with `watr-`. Almost everything is inside `@layer watr`, so any normal CSS you write overrides it without `!important`.
+
+The exception is the page itself: the `body` background, text color and font, plus `color-scheme`. Resets like normalize.css (and some hosts) set those outside any layer, and an unlayered rule always beats a layered one, so if these lived in the layer the page would stay white in dark mode. They sit outside it instead. Anything you write after `watr.css` still wins, so link resets *before* it.
 
 | part | classes | notes |
 | --- | --- | --- |
@@ -101,10 +104,54 @@ All classes start with `watr-`. Everything is inside `@layer watr`, so any norma
 | blob | `.watr-blob` `.watr-blob__face` | error and empty states |
 | quote | `.watr-quote` + `<cite>` | cite gets the `- ` prefix automatically |
 | sidebar | `.watr-sidebar` `.is-hidden` | toggle `.is-hidden` with JS |
-| modal | `.watr-modal` | dimmed full-screen backdrop |
+| checks | `.watr-check` wrapping a checkbox or radio | square box (radios stay round), bright when on |
+| switch | `.watr-switch` wrapping a checkbox | square track, square knob that casts a tiny drop |
+| tabs | `.watr-tabs` + `.watr-tab` with `aria-selected` | tabs sit on a thick bright rule and the active one joins it |
+| dropdown | `<details class="watr-dropdown">` + `<summary class="watr-btn">` + `.watr-menu` | no JS needed. `--right` opens toward the left edge. `.is-danger` on the delete item |
+| tags | `.watr-tag` `--bright` `--deep` `--warning` `--danger` | small square lowercase labels |
+| avatar | `.watr-avatar` `--small` `--big` + `.watr-avatar__status` `--online` `--away` `--busy` | square picture (initials or a `background-image`), round dot poking out the top-right. online is the site's hue, not green |
+| tooltip | `data-watr-tip="text"`, add `data-watr-tip-end` near the right edge | CSS only |
+| progress | `<progress class="watr-progress">` | flat track, bright fill |
+| loading | `.watr-loading` with three `<i>` | three squares taking turns. sits still for reduced motion |
+| pagination | `.watr-pages` with `aria-current="page"` on the current one | `.is-gap` for the dots |
+| breadcrumbs | `<ol class="watr-crumbs">` | lowercase, slashes between |
+| table | `.watr-table-wrap` > `table.watr-table` `--compact` | bar-colored header, striped rows, `.num` right-aligns numbers, `tr.is-selected` goes bright, `.muted` for quiet cells |
+| modal | `<dialog class="watr-dialog">` `--danger` `--blob` with `__head` `__body` `__foot` | a tiny page with its own bar. drops in from the top-left. the danger one gets a red bar |
+| toast | `watr.toast()` or `.watr-toasts` > `.watr-toast` `--plain` `--warning` `--danger` | bottom-right, where the shadows fall. the line along the bottom is the timer, hover pauses it |
+| old modal | `.watr-modal` | the original dimmed backdrop from watrfiles. use `.watr-dialog` for new stuff |
 | helpers | `.watr-row` `.watr-stack` `.watr-center` `img.watr-emoji` | |
 
 Dark mode follows the system setting. `data-theme="dark"` or `data-theme="light"` on `<html>` forces one.
+
+### watr.js
+
+Load it at the end of `<body>`. It wires things up by attribute, so most of the time you never call it:
+
+```html
+<button class="watr-btn" data-watr-open="rename">Rename</button>
+
+<dialog class="watr-dialog" id="rename">
+    <form method="dialog">
+        <div class="watr-dialog__head"><h2>rename file</h2><button type="button" class="watr-dialog__close" data-watr-close aria-label="close">&times;</button></div>
+        <div class="watr-dialog__body"><input name="name" value="backup.zip"></div>
+        <div class="watr-dialog__foot">
+            <button type="button" class="watr-btn watr-btn--quiet" data-watr-close>Cancel</button>
+            <button class="watr-btn" value="rename">Rename</button>
+        </div>
+    </form>
+</dialog>
+```
+
+- `data-watr-open="id"` opens a dialog, `data-watr-close` closes the one it's in, clicking the backdrop closes it too. Read `dialog.returnValue` in its `close` event to see which button was pressed.
+- `watr.toast("Uploaded backup.zip", { type, action, onAction, time })`. `type` is `info` (default), `plain`, `warning` or `danger`. `time` is in ms, `0` means it stays until closed. Use `time: 0` for errors.
+- Tabs select on click. Header buttons in a `.watr-table` sort that column (put raw numbers in `data-sort` for sizes). Row checkboxes toggle `.is-selected`, and a header checkbox selects every row.
+- `data-watr-sidebar="id"` toggles a sidebar.
+
+### toasts vs messages vs modals
+
+- **message** (`.watr-msg`): something about the form or page in front of you. Stays until it's fixed.
+- **toast**: something that just happened and needs no answer. "Uploaded backup.zip", "Link copied". Add `undo` when you can.
+- **modal**: you need an answer before going on. Deleting things, renaming, being logged out. Danger modals say exactly what will be lost, and the safe button goes first.
 
 ---
 
@@ -136,11 +183,13 @@ Things I noticed while pulling this out of watrfiles. Decide on each and move it
 - [ ] **White on the bar color is only 3.2:1 contrast.** Fine for bold nav links, too low for small body text. Options: darken `--watr-bar` to around 55% lightness, or keep it and never put small text on bars. (Black on bright is 11:1, no problem there.)
 - [ ] **Yellow warnings had no text color** in the original CSS. The kit uses black text on yellow. Confirm that's the look.
 - [ ] **`.container` in `base.css` has a broken background** (`background-color: --container-color;` is missing `var()`), so it never actually got its grey. The kit's `.watr-panel` uses the grey. Decide if panels should be grey or white.
-- [ ] **Avatar + status dot** from `base.css` isn't in the kit yet.
+- [ ] **Toast position.** Bottom-right fits the light-from-top-left idea. On phones that's also where thumbs are. Check that it doesn't cover anything important on real pages.
+- [ ] **Tables on phones** just scroll sideways for now. Decide if some tables should turn into stacked cards instead.
 - [ ] **A display moment.** Montserrat at 900 weight could be a thing for big landing headings. Try it on one site first.
 - [ ] **Icons.** watrfiles loads Font Awesome but doesn't use it yet. Pick one icon set, or decide on none.
 - [ ] **Move watrfiles onto the kit** so the source site and the guide stop drifting apart.
 
 ## changelog
 
+- **0.2** (2026-10): the bar no longer casts a shadow onto alert strips; the stack casts one shadow from its bottom. fixed the page background not changing in dark mode when a reset is loaded. added modals, toasts, tables, tabs, dropdowns, checks, switches, tags, avatars, tooltips, progress, loading, pagination, breadcrumbs, `watr.js`, and a full mockup page.
 - **0.1** (2026-10): first pull from watrfiles. ramp, drop shadow, bars, buttons, fields, split, blob, voice.
