@@ -11,7 +11,7 @@ This folder is self-contained. Copy it into any project.
 | `index.html` | live guide. open it in a browser, drag the knobs, copy the snippet, click around the mockup |
 | `assets/` | the blobs and the watrlabs icon |
 
-Version 0.3. Taken from watrfiles (`public/assets/base.css`, the login, 404 and 500 pages).
+Version 0.4. Taken from watrfiles (`public/assets/base.css`, the login, 404 and 500 pages).
 
 ---
 
@@ -93,7 +93,7 @@ The exception is the page itself: the `body` background, text color and font, pl
 
 | part | classes | notes |
 | --- | --- | --- |
-| nav bar | `.watr-bar` `.watr-bar__group` `.watr-bar__home` | two groups, left and right. links lowercase except the site name |
+| nav bar | `.watr-bar` > `.watr-bar__home` + `.watr-bar__toggle` + `.watr-bar__links` > two `.watr-bar__group` | links lowercase except the site name. under 600px wide the links fold behind a "menu" button and open as full-width rows inside the bar (needs `watr.js`; without it they just wrap). `.watr-bar__me` for the signed-in person's avatar + name |
 | notice strip | `.watr-strip` `--warning` `--info` | red by default. goes straight under the bar |
 | footer | `.watr-footer` | sticks to the bottom on short pages |
 | button | `.watr-btn` `--quiet` `--danger`, `:disabled` | works on `<a>` and `<button>` |
@@ -109,13 +109,14 @@ The exception is the page itself: the `body` background, text color and font, pl
 | tabs | `.watr-tabs` + `.watr-tab` with `aria-selected` | tabs sit on a thick bright rule and the active one joins it |
 | dropdown | `<details class="watr-dropdown">` + `<summary class="watr-btn">` + `.watr-menu` | no JS needed. `--right` opens toward the left edge. `.is-danger` on the delete item |
 | tags | `.watr-tag` `--bright` `--deep` `--warning` `--danger` | small square lowercase labels |
-| avatar | `.watr-avatar` `--small` `--big` + `.watr-avatar__status` `--online` `--away` `--busy` | square picture (initials or a `background-image`). status is a bar along the bottom edge, never a dot: hue for online, yellow away, red busy, grey offline |
+| avatar | `.watr-avatar` `--small` `--big` + `.watr-avatar__status` `--online` `--away` `--busy` | square picture (a `background-image`, initials, or a default below). status is a bar along the bottom edge, never a dot: hue for online, yellow away, red busy, grey offline |
+| default avatar | `.watr-avatar--blob` or `.watr-avatar--person` | for people with no picture, drawn in the site's hue. blobs have six faces: set `data-watr-blob="0"`-`"5"` yourself (`{{ user.id % 6 }}` in twig), or give it `data-watr-name` and `watr.js` picks one from the name, so the same person always gets the same blob |
 | tooltip | `data-watr-tip="text"`, add `data-watr-tip-end` near the right edge | CSS only |
 | progress | `<progress class="watr-progress">` | flat track, bright fill |
 | loading | `.watr-loading` with three `<i>` | three squares taking turns. sits still for reduced motion |
 | pagination | `.watr-pages` with `aria-current="page"` on the current one | `.is-gap` for the dots |
 | breadcrumbs | `<ol class="watr-crumbs">` | lowercase, slashes between |
-| table | `.watr-table-wrap` > `table.watr-table` `--compact` | bar-colored header, striped rows, `.num` right-aligns numbers, `tr.is-selected` goes bright, `.muted` for quiet cells |
+| table | `.watr-table-wrap` > `table.watr-table` `--compact` `--stack` | bar-colored header, striped rows, `.num` right-aligns numbers, `tr.is-selected` goes bright, `.muted` for quiet cells. `--stack` turns each row into a card under 600px: mark the title cell `td.is-main`, the rest get their column name (`data-label`, filled from the header by `watr.js`) |
 | modal | `<dialog class="watr-dialog">` `--danger` `--blob` with `__head` `__body` `__foot` | a tiny page with its own bar. drops in from the top-left. the danger one gets a red bar |
 | toast | `watr.toast()` or `.watr-toasts` > `.watr-toast` `--plain` `--warning` `--danger` | bottom-right, where the shadows fall. the line along the bottom is the timer, hover pauses it |
 | old modal | `.watr-modal` | the original dimmed backdrop from watrfiles. use `.watr-dialog` for new stuff |
@@ -146,6 +147,17 @@ Load it at the end of `<body>`. It wires things up by attribute, so most of the 
 - `watr.toast("Uploaded backup.zip", { type, action, onAction, time })`. `type` is `info` (default), `plain`, `warning` or `danger`. `time` is in ms, `0` means it stays until closed. Use `time: 0` for errors.
 - Tabs select on click. Header buttons in a `.watr-table` sort that column (put raw numbers in `data-sort` for sizes). Row checkboxes toggle `.is-selected`, and a header checkbox selects every row.
 - `data-watr-sidebar="id"` toggles a sidebar.
+- Turns on the bar's phone menu button, fills `data-label` on `--stack` tables, and picks blob faces. If you add markup later, call `watr.setup(element)`.
+
+### phones
+
+Everything is built to hold up at 375px wide:
+
+- the bar folds its links behind "menu" (use the newer bar markup above)
+- tabs stay on one row and scroll sideways
+- `--stack` tables become cards; plain tables scroll sideways inside their wrap
+- split and blob layouts stack, the thick rule turns flat
+- dialogs and toasts shrink to the screen with a 16px gap
 
 ### toasts vs messages vs modals
 
@@ -184,13 +196,15 @@ Things I noticed while pulling this out of watrfiles. Decide on each and move it
 - [ ] **Yellow warnings had no text color** in the original CSS. The kit uses black text on yellow. Confirm that's the look.
 - [x] **Panel color.** The old `.container` grey never applied in `base.css` (`background-color: --container-color;` is missing `var()`). Panels now use a pale wash of the hue instead of grey, so they change with each site.
 - [ ] **Toast position.** Bottom-right fits the light-from-top-left idea. On phones that's also where thumbs are. Check that it doesn't cover anything important on real pages.
-- [ ] **Tables on phones** just scroll sideways for now. Decide if some tables should turn into stacked cards instead.
+- [ ] **Sorting on phones.** Stacked tables hide the header, so there's nothing to tap to sort. Maybe a small "sort by" select above the table.
+- [ ] **Blob faces.** Six to start. Draw more, or a special one for admins.
 - [ ] **A display moment.** Montserrat at 900 weight could be a thing for big landing headings. Try it on one site first.
 - [ ] **Icons.** watrfiles loads Font Awesome but doesn't use it yet. Pick one icon set, or decide on none.
 - [ ] **Move watrfiles onto the kit** so the source site and the guide stop drifting apart.
 
 ## changelog
 
+- **0.4** (2026-10): phone layout pass. bar folds into a menu, tabs scroll, tables can stack into cards. default avatars: a person, or one of six blobs picked from the username.
 - **0.3** (2026-10): avatar status is a bar along the bottom instead of a dot. initials avatars are bright on deep. panels are a pale wash of the hue instead of flat grey.
 - **0.2** (2026-10): the bar no longer casts a shadow onto alert strips; the stack casts one shadow from its bottom. fixed the page background not changing in dark mode when a reset is loaded. added modals, toasts, tables, tabs, dropdowns, checks, switches, tags, avatars, tooltips, progress, loading, pagination, breadcrumbs, `watr.js`, and a full mockup page.
 - **0.1** (2026-10): first pull from watrfiles. ramp, drop shadow, bars, buttons, fields, split, blob, voice.

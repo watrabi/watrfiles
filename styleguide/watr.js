@@ -10,6 +10,10 @@
 //   tables:   a <button> in a .watr-table header cell sorts by that column. put a raw value in
 //             data-sort on cells that don't sort by their text (sizes, dates)
 //             a checkbox in a row marks the row .is-selected, one in the header selects every row
+//             .watr-table--stack cells get a data-label from their column header, for the phone layout
+//   bar:      turns on .watr-bar__toggle, the phone menu button
+//   blobs:    .watr-avatar--blob with a data-watr-name gets a face picked from the name, so the
+//             same person always gets the same blob. no name = a random one
 
 (function () {
     function toastRegion() {
@@ -95,6 +99,42 @@
         rows.forEach(function (r) { body.appendChild(r); });
     }
 
+    const BLOB_FACES = 6;
+
+    function hash(text) {
+        let h = 0;
+        for (const ch of text) h = (h * 31 + ch.codePointAt(0)) >>> 0;
+        return h;
+    }
+
+    // run on page load. call watr.setup(element) again after adding new markup
+    function setup(root) {
+        root = root || document;
+
+        root.querySelectorAll(".watr-avatar--blob:not([data-watr-blob])").forEach(function (el) {
+            const name = el.dataset.watrName || el.getAttribute("aria-label") || "";
+            const n = name ? hash(name.toLowerCase()) : Math.floor(Math.random() * 1000);
+            el.dataset.watrBlob = String(n % BLOB_FACES);
+        });
+
+        root.querySelectorAll(".watr-table--stack").forEach(function (table) {
+            const heads = table.tHead ? Array.from(table.tHead.rows[0].cells).map(function (th) { return th.textContent.trim(); }) : [];
+            Array.from(table.tBodies).forEach(function (body) {
+                Array.from(body.rows).forEach(function (row) {
+                    Array.from(row.cells).forEach(function (cell, i) {
+                        if (!cell.hasAttribute("data-label") && !cell.classList.contains("is-main") && heads[i]) {
+                            cell.dataset.label = heads[i];
+                        }
+                    });
+                });
+            });
+        });
+
+        root.querySelectorAll(".watr-bar__toggle:not([aria-expanded])").forEach(function (btn) {
+            btn.setAttribute("aria-expanded", "false");
+        });
+    }
+
     document.addEventListener("change", function (e) {
         if (!e.target.matches(".watr-table input[type=checkbox]")) return;
         const table = e.target.closest("table");
@@ -139,6 +179,19 @@
             return;
         }
 
+        const barToggle = e.target.closest(".watr-bar__toggle");
+        if (barToggle) {
+            barToggle.setAttribute("aria-expanded", barToggle.getAttribute("aria-expanded") === "true" ? "false" : "true");
+            return;
+        }
+
+        // picking something from the phone menu closes it
+        const barLink = e.target.closest(".watr-bar__links a, .watr-bar__links button");
+        if (barLink) {
+            const toggle = barLink.closest(".watr-bar").querySelector(".watr-bar__toggle");
+            if (toggle) toggle.setAttribute("aria-expanded", "false");
+        }
+
         const tab = e.target.closest(".watr-tabs [role=tab]");
         if (tab) {
             tab.parentElement.querySelectorAll("[role=tab]").forEach(function (t) {
@@ -151,5 +204,11 @@
         if (sortButton) sortTable(sortButton.closest("th"));
     });
 
-    window.watr = { toast: toast, dismiss: dismiss };
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", function () { setup(); });
+    } else {
+        setup();
+    }
+
+    window.watr = { toast: toast, dismiss: dismiss, setup: setup };
 })();

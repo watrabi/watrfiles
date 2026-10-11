@@ -189,6 +189,69 @@ body {
 
     .watr-bar .watr-bar__home { text-transform: none; }
 
+    /* the newer bar markup: home link, a phone menu button, then the link groups.
+       <nav class="watr-bar">
+           <a class="watr-bar__home" href="/">watrfiles</a>
+           <button class="watr-bar__toggle" type="button">menu</button>
+           <div class="watr-bar__links"><div class="watr-bar__group">...</div><div class="watr-bar__group">...</div></div>
+       </nav>
+       watr.js turns the button on. without js the links just wrap like before. */
+    .watr-bar > .watr-bar__home { margin-left: 15px; }
+    .watr-bar__links {
+        flex: 1;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .watr-bar__links > .watr-bar__group:first-child { padding-left: 0; }
+    .watr-bar__toggle {
+        display: none;
+        font: inherit;
+        font-weight: 600;
+        text-transform: lowercase;
+        min-height: var(--watr-bar-h);
+        padding: 0 5px;
+        margin-right: 15px;
+        border: none;
+        background: none;
+        color: var(--watr-on-bar);
+        cursor: pointer;
+    }
+    .watr-bar__toggle::after { content: " \25BE"; }
+    .watr-bar__toggle[aria-expanded="true"]::after { content: " \25B4"; }
+
+    /* the signed-in person, sitting in the bar */
+    .watr-bar .watr-bar__me { display: inline-flex; align-items: center; gap: 8px; text-transform: none; }
+
+    @media (max-width: 600px) {
+        .watr-bar__toggle[aria-expanded] { display: block; margin-left: auto; }
+        .watr-bar__toggle[aria-expanded="false"] ~ .watr-bar__links { display: none; }
+        .watr-bar__toggle[aria-expanded] ~ .watr-bar__links {
+            flex: none;
+            width: 100%;
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .watr-bar__toggle[aria-expanded] ~ .watr-bar__links .watr-bar__group {
+            flex-direction: column;
+            align-items: stretch;
+            padding: 0;
+        }
+        .watr-bar__toggle[aria-expanded] ~ .watr-bar__links :is(a, button) {
+            display: flex;
+            align-items: center;
+            min-height: 44px;
+            padding: 0 20px;
+            text-align: left;
+            border-top: 1px solid rgb(255 255 255 / 0.2);
+        }
+        .watr-bar__toggle[aria-expanded] ~ .watr-bar__links :is(a, button):hover {
+            text-decoration: none;
+            background-color: rgb(0 0 0 / 0.1);
+        }
+    }
+
     .watr-footer {
         color: var(--watr-on-bar);
         background-color: var(--watr-bar);
@@ -436,10 +499,12 @@ body {
     /* ---------- tabs: sit on a thick bright rule, the active one joins it ---------- */
     .watr-tabs {
         display: flex;
-        flex-wrap: wrap;
         gap: 5px;
+        overflow-x: auto;           /* too many tabs for a phone? they scroll sideways on one row */
+        scrollbar-width: none;
         border-bottom: var(--watr-rule-w) solid var(--watr-bright);
     }
+    .watr-tabs::-webkit-scrollbar { display: none; }
     .watr-tab {
         font: inherit;
         font-weight: 600;
@@ -451,6 +516,8 @@ body {
         cursor: pointer;
         background-color: var(--watr-field);
         color: var(--watr-text);
+        flex: none;
+        white-space: nowrap;
     }
     .watr-tab:hover { background-color: var(--watr-field-over); }
     .watr-tab[aria-selected="true"], .watr-tab[aria-current="page"] {
@@ -537,6 +604,31 @@ body {
     .watr-avatar__status--online { background-color: var(--watr-bright); }
     .watr-avatar__status--away   { background-color: var(--watr-warning); }
     .watr-avatar__status--busy   { background-color: var(--watr-danger); }
+
+    /* ---------- default pictures: a person, or a blob ----------
+       for people with no picture. both are drawn in the site's hue, so they change per site.
+       blobs have six faces. set data-watr-blob="0"-"5" yourself (user id % 6 works), or give
+       the avatar a data-watr-name and watr.js picks one from the name, so the same person
+       always gets the same face. */
+    .watr-avatar--person::before, .watr-avatar--blob::before, .watr-avatar--blob::after {
+        content: "";
+        position: absolute;
+        top: 12%;
+        left: 8%;
+        right: 8%;
+        bottom: calc(max(4px, 12%) + 2px);  /* sits on top of the status bar, never under it */
+        -webkit-mask: var(--watr-face) center / 100% 100% no-repeat;
+        mask: var(--watr-face) center / 100% 100% no-repeat;
+    }
+    .watr-avatar--person::before { --watr-face: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='34' r='20'/%3E%3Cpath d='M10 100C10 74 28 60 50 60C72 60 90 74 90 100Z'/%3E%3C/svg%3E"); background-color: var(--watr-bright); }
+    .watr-avatar--blob::before { --watr-face: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 12C77 12 93 36 95 62C96 76 96 100 96 100H4C4 100 4 76 5 62C7 36 23 12 50 12Z'/%3E%3C/svg%3E"); background-color: var(--watr-bright); }
+    .watr-avatar--blob::after { --watr-face: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='35' cy='50' r='8'/%3E%3Ccircle cx='65' cy='50' r='8'/%3E%3Cpath d='M33 68Q50 84 67 68' stroke='black' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E"); background-color: var(--watr-deep); }
+    .watr-avatar--blob[data-watr-blob="0"]::after { --watr-face: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='35' cy='50' r='8'/%3E%3Ccircle cx='65' cy='50' r='8'/%3E%3Cpath d='M33 68Q50 84 67 68' stroke='black' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E"); }  /* happy */
+    .watr-avatar--blob[data-watr-blob="1"]::after { --watr-face: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='35' cy='50' r='8'/%3E%3Ccircle cx='65' cy='50' r='8'/%3E%3Cellipse cx='50' cy='74' rx='7' ry='9'/%3E%3C/svg%3E"); }  /* surprised */
+    .watr-avatar--blob[data-watr-blob="2"]::after { --watr-face: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M27 52Q35 59 43 52M57 52Q65 59 73 52' stroke='black' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Cpath d='M42 72Q50 77 58 72' stroke='black' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E"); }  /* sleepy */
+    .watr-avatar--blob[data-watr-blob="3"]::after { --watr-face: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='35' cy='50' r='8'/%3E%3Ccircle cx='65' cy='50' r='8'/%3E%3Cpath d='M38 73H62' stroke='black' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E"); }  /* meh */
+    .watr-avatar--blob[data-watr-blob="4"]::after { --watr-face: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='35' cy='50' r='8'/%3E%3Cpath d='M56 51H72' stroke='black' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Cpath d='M33 68Q50 84 67 68' stroke='black' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E"); }  /* wink */
+    .watr-avatar--blob[data-watr-blob="5"]::after { --watr-face: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M27 56L35 46L43 56M57 56L65 46L73 56' stroke='black' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Cpath d='M33 64H67Q67 84 50 84Q33 84 33 64Z'/%3E%3C/svg%3E"); }  /* grin */
 
     /* ---------- tooltip: add data-watr-tip="text" to anything ---------- */
     [data-watr-tip] { position: relative; }
@@ -671,6 +763,42 @@ body {
     .watr-table th[aria-sort="ascending"] button::after  { content: " \25B4"; }
     .watr-table th[aria-sort="descending"] button::after { content: " \25BE"; }
     .watr-table--compact th, .watr-table--compact td { padding: 5px 10px; }
+    .watr-table td.is-main { font-weight: 700; }
+
+    /* --stack: on phones every row turns into a little card.
+       mark the row's title cell .is-main. other cells show their column name, taken from
+       data-label (watr.js fills it in from the header if you leave it out) */
+    @media (max-width: 600px) {
+        .watr-table--stack, .watr-table--stack tbody { display: block; }
+        .watr-table--stack thead { display: none; }
+        .watr-table--stack tr {
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr);
+            column-gap: 10px;
+            align-items: center;
+            padding: 10px 12px;
+        }
+        .watr-table--stack td { padding: 2px 0; }
+        .watr-table--stack td.is-main { grid-column: auto / -1; padding-bottom: 6px; }
+        .watr-table--stack td[data-label]:not(.is-main) {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 15px;
+            text-align: right;
+        }
+        .watr-table--stack td[data-label]:not(.is-main)::before {
+            content: attr(data-label);
+            flex: none;
+            text-align: left;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: lowercase;
+            color: var(--watr-muted);
+        }
+        .watr-table--stack tr.is-selected td::before { color: inherit; }
+    }
 
     /* ---------- dialog: a little page with its own bar, dropping in from the top-left ---------- */
     .watr-dialog {

@@ -83,13 +83,8 @@
     .fields { display: grid; gap: 5px; max-width: 240px; }
 
     /* voice */
-    .voice { width: 100%; border-collapse: collapse; margin-top: 15px; }
-    .voice th, .voice td { text-align: left; vertical-align: top; padding: 10px 12px; }
-    .voice thead th { background-color: var(--watr-bar); color: var(--watr-on-bar); }
-    .voice tbody tr:nth-child(even) { background-color: var(--watr-surface); }
-    .voice td:first-child { font-weight: 600; width: 22%; }
-    .voice td:last-child { color: var(--watr-muted); }
-    .table-wrap { overflow-x: auto; box-shadow: var(--watr-drop); }
+    .voice td { vertical-align: top; }
+    @media (min-width: 601px) { .voice td.is-main { width: 22%; } }
 
     /* recipe */
     .recipe { max-width: 70ch; padding-left: 1.4em; }
@@ -127,11 +122,11 @@
     .mock__upload { display: grid; grid-template-columns: auto minmax(0, 1fr) 3rem; gap: 12px; align-items: center; font-size: 0.9rem; }
     .mock__upload output { text-align: right; font-variant-numeric: tabular-nums; }
     .mock__foot { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; color: var(--watr-muted); font-size: 0.9rem; }
-    .mock .watr-avatar { margin-left: 6px; }
     .mock .watr-table td:first-child, .mock .watr-table th:first-child { width: 20px; padding-right: 0; }
 
     .theme-btn { font: inherit; font-weight: 600; background: none; border: none; color: var(--watr-on-bar); cursor: pointer; padding: 5px; text-transform: lowercase; }
     .theme-btn:hover { text-decoration: underline; text-underline-offset: 4px; }
+    @media (max-width: 600px) { .theme-btn { padding: 0 20px; } }
 
     @media (max-width: 760px) {
         .tuner { grid-template-columns: minmax(0, 1fr); }
@@ -143,8 +138,10 @@
 <body>
 
 <nav class="watr-bar" aria-label="sections">
+    <a href="#top" class="watr-bar__home">watr style</a>
+    <button type="button" class="watr-bar__toggle">menu</button>
+    <div class="watr-bar__links">
     <div class="watr-bar__group">
-        <a href="#top" class="watr-bar__home">watr style</a>
         <a href="#knobs">knobs</a>
         <a href="#keep">keep</a>
         <a href="#parts">parts</a>
@@ -155,9 +152,10 @@
     <div class="watr-bar__group">
         <button class="theme-btn" id="theme-toggle" type="button">dark</button>
     </div>
+    </div>
 </nav>
 <div class="watr-strip watr-strip--warning">
-    <p>This guide is incomplete! It's version 0.3, keep poking at it.</p>
+    <p>This guide is incomplete! It's version 0.4, keep poking at it.</p>
 </div>
 
 <main class="page" id="top">
@@ -291,10 +289,14 @@
             <div class="part">
                 <h3>frame <code>.watr-bar .watr-strip .watr-footer</code></h3>
                 <div class="stage stage--flush">
-                    <div class="watr-bar">
-                        <div class="watr-bar__group"><a href="#parts" class="watr-bar__home">watrfiles</a><a href="#parts">home</a><a href="#parts">files</a></div>
-                        <div class="watr-bar__group"><a href="#parts">accounts</a><a href="#parts">sword</a></div>
-                    </div>
+                    <nav class="watr-bar" aria-label="example">
+                        <a href="#" class="watr-bar__home">watrfiles</a>
+                        <button type="button" class="watr-bar__toggle">menu</button>
+                        <div class="watr-bar__links">
+                            <div class="watr-bar__group"><a href="#">home</a><a href="#">files</a></div>
+                            <div class="watr-bar__group"><a href="#">accounts</a><a href="#">sword</a></div>
+                        </div>
+                    </nav>
                     <div class="watr-strip"><p>This site is incomplete!</p></div>
                     <div class="watr-strip watr-strip--info"><p>Maintenance tonight at 11pm.</p></div>
                     <div style="height: 70px;"></div>
@@ -408,9 +410,9 @@
             </div>
 
             <div class="part">
-                <h3>table <code>.watr-table</code> <code>--compact</code></h3>
+                <h3>table <code>.watr-table</code> <code>--compact</code> <code>--stack</code></h3>
                 <div class="watr-table-wrap">
-                    <table class="watr-table watr-table--compact">
+                    <table class="watr-table watr-table--compact watr-table--stack">
                         <thead><tr>
                             <th aria-sort="ascending"><button type="button">user</button></th>
                             <th>role</th>
@@ -418,15 +420,15 @@
                             <th class="num"><button type="button">joined</button></th>
                         </tr></thead>
                         <tbody>
-                        <tr><td data-sort="sword"><span class="user-cell"><span class="watr-avatar watr-avatar--small">sw<i class="watr-avatar__status watr-avatar__status--online"></i></span>sword</span></td><td><span class="watr-tag watr-tag--deep">admin</span></td><td class="num">214</td><td class="num">2025-03-14</td></tr>
-                        <tr><td data-sort="watrboi"><span class="user-cell"><span class="watr-avatar watr-avatar--small">wb<i class="watr-avatar__status watr-avatar__status--away"></i></span>watrboi</span></td><td><span class="watr-tag watr-tag--deep">admin</span></td><td class="num">1,032</td><td class="num">2024-11-02</td></tr>
-                        <tr><td data-sort="bubbles"><span class="user-cell"><span class="watr-avatar watr-avatar--small">bu<i class="watr-avatar__status watr-avatar__status--online"></i></span>bubbles</span></td><td><span class="watr-tag">member</span></td><td class="num">87</td><td class="num">2026-01-18</td></tr>
-                        <tr><td data-sort="centipede"><span class="user-cell"><span class="watr-avatar watr-avatar--small">ce<i class="watr-avatar__status watr-avatar__status--busy"></i></span>centipede</span></td><td><span class="watr-tag">member</span></td><td class="num">12</td><td class="num">2026-09-30</td></tr>
-                        <tr><td data-sort="lurker"><span class="user-cell"><span class="watr-avatar watr-avatar--small">lu<i class="watr-avatar__status"></i></span>lurker</span></td><td><span class="watr-tag watr-tag--danger">banned</span></td><td class="num">0</td><td class="num">2026-05-05</td></tr>
+                        <tr><td class="is-main" data-sort="sword"><span class="user-cell"><span class="watr-avatar watr-avatar--small watr-avatar--blob" data-watr-name="sword" aria-hidden="true"><i class="watr-avatar__status watr-avatar__status--online"></i></span>sword</span></td><td><span class="watr-tag watr-tag--deep">admin</span></td><td class="num">214</td><td class="num">2025-03-14</td></tr>
+                        <tr><td class="is-main" data-sort="watrboi"><span class="user-cell"><span class="watr-avatar watr-avatar--small watr-avatar--blob" data-watr-name="watrboi" aria-hidden="true"><i class="watr-avatar__status watr-avatar__status--away"></i></span>watrboi</span></td><td><span class="watr-tag watr-tag--deep">admin</span></td><td class="num">1,032</td><td class="num">2024-11-02</td></tr>
+                        <tr><td class="is-main" data-sort="bubbles"><span class="user-cell"><span class="watr-avatar watr-avatar--small watr-avatar--blob" data-watr-name="bubbles" aria-hidden="true"><i class="watr-avatar__status watr-avatar__status--online"></i></span>bubbles</span></td><td><span class="watr-tag">member</span></td><td class="num">87</td><td class="num">2026-01-18</td></tr>
+                        <tr><td class="is-main" data-sort="centipede"><span class="user-cell"><span class="watr-avatar watr-avatar--small watr-avatar--blob" data-watr-name="centipede" aria-hidden="true"><i class="watr-avatar__status watr-avatar__status--busy"></i></span>centipede</span></td><td><span class="watr-tag">member</span></td><td class="num">12</td><td class="num">2026-09-30</td></tr>
+                        <tr><td class="is-main" data-sort="lurker"><span class="user-cell"><span class="watr-avatar watr-avatar--small watr-avatar--person" data-watr-name="lurker" aria-hidden="true"><i class="watr-avatar__status"></i></span>lurker</span></td><td><span class="watr-tag watr-tag--danger">banned</span></td><td class="num">0</td><td class="num">2026-05-05</td></tr>
                         </tbody>
                     </table>
                 </div>
-                <p class="note" style="margin-top: 10px;">Click a header to sort. The full-size table is in the mockup below.</p>
+                <p class="note" style="margin-top: 10px;">Click a header to sort. On a phone, <code>--stack</code> turns each row into a card. The full-size table is in the mockup below.</p>
             </div>
 
             <div class="part">
@@ -443,12 +445,21 @@
                         </div>
                     </div>
                     <div>
-                        <h4>avatars and status</h4>
-                        <div class="watr-row" style="gap: 22px; align-items: flex-end;">
-                            <span class="watr-avatar watr-avatar--big">sw<i class="watr-avatar__status watr-avatar__status--online"></i></span>
-                            <span class="watr-avatar">wb<i class="watr-avatar__status watr-avatar__status--away"></i></span>
-                            <span class="watr-avatar watr-avatar--small">ce<i class="watr-avatar__status watr-avatar__status--busy"></i></span>
-                            <span class="watr-avatar watr-avatar--small">lu<i class="watr-avatar__status"></i></span>
+                        <h4>avatars: blob, person, letters</h4>
+                        <div class="watr-row" style="gap: 12px; align-items: flex-end;">
+                            <span class="watr-avatar watr-avatar--big watr-avatar--blob" data-watr-name="sword" role="img" aria-label="sword, online"><i class="watr-avatar__status watr-avatar__status--online"></i></span>
+                            <span class="watr-avatar watr-avatar--person" role="img" aria-label="no picture, away"><i class="watr-avatar__status watr-avatar__status--away"></i></span>
+                            <span class="watr-avatar" role="img" aria-label="watrboi, busy">wb<i class="watr-avatar__status watr-avatar__status--busy"></i></span>
+                            <span class="watr-avatar watr-avatar--small watr-avatar--blob" data-watr-blob="2" role="img" aria-label="offline"><i class="watr-avatar__status"></i></span>
+                        </div>
+                        <h4 style="margin-top: 18px;">the six blobs</h4>
+                        <div class="watr-row" style="gap: 8px;">
+                            <span class="watr-avatar watr-avatar--blob" data-watr-blob="0" role="img" aria-label="happy blob"></span>
+                            <span class="watr-avatar watr-avatar--blob" data-watr-blob="1" role="img" aria-label="surprised blob"></span>
+                            <span class="watr-avatar watr-avatar--blob" data-watr-blob="2" role="img" aria-label="sleepy blob"></span>
+                            <span class="watr-avatar watr-avatar--blob" data-watr-blob="3" role="img" aria-label="meh blob"></span>
+                            <span class="watr-avatar watr-avatar--blob" data-watr-blob="4" role="img" aria-label="winking blob"></span>
+                            <span class="watr-avatar watr-avatar--blob" data-watr-blob="5" role="img" aria-label="grinning blob"></span>
                         </div>
                     </div>
                     <div>
@@ -543,10 +554,14 @@
         <p class="lede">A watrfiles page made only from the parts above. It works: switch tabs, sort the columns, tick rows, try Upload, or use the more menu.</p>
 
         <div class="stage stage--flush mock">
-            <div class="watr-bar">
-                <div class="watr-bar__group"><a href="#" class="watr-bar__home">watrfiles</a><a href="#">home</a><a href="#">files</a></div>
-                <div class="watr-bar__group"><a href="#">accounts</a><span class="watr-avatar watr-avatar--small" data-watr-tip="sword, online" data-watr-tip-end>sw<i class="watr-avatar__status watr-avatar__status--online"></i></span></div>
-            </div>
+            <nav class="watr-bar" aria-label="watrfiles">
+                <a href="#" class="watr-bar__home">watrfiles</a>
+                <button type="button" class="watr-bar__toggle">menu</button>
+                <div class="watr-bar__links">
+                    <div class="watr-bar__group"><a href="#">home</a><a href="#">files</a></div>
+                    <div class="watr-bar__group"><a href="#">accounts</a><a href="#" class="watr-bar__me"><span class="watr-avatar watr-avatar--small watr-avatar--blob" data-watr-name="sword" aria-hidden="true"><i class="watr-avatar__status watr-avatar__status--online"></i></span>sword</a></div>
+                </div>
+            </nav>
             <div class="watr-strip"><p>This site is incomplete!</p></div>
 
             <div class="mock__body">
@@ -585,7 +600,7 @@
                 </div>
 
                 <div class="watr-table-wrap">
-                    <table class="watr-table">
+                    <table class="watr-table watr-table--stack">
                         <thead><tr>
                             <th><label class="watr-check"><input type="checkbox" id="mf-all" aria-label="select all files"></label></th>
                             <th aria-sort="ascending"><button type="button">name</button></th>
@@ -595,11 +610,11 @@
                             <th>sharing</th>
                         </tr></thead>
                         <tbody>
-                                <tr class="is-selected"><td><label class="watr-check"><input type="checkbox" id="mf-0" aria-label="select backup.zip" checked></label></td><td><b>backup.zip</b></td><td class="num" data-sort="13002342">12.4 MB</td><td class="muted">sword</td><td class="num">2026-10-02</td><td><span class="watr-tag watr-tag--bright">public</span></td></tr>
-                                <tr><td><label class="watr-check"><input type="checkbox" id="mf-1" aria-label="select centipede.png"></label></td><td><b>centipede.png</b></td><td class="num" data-sort="860160">840 KB</td><td class="muted">sword</td><td class="num">2026-09-28</td><td><span class="watr-tag">private</span></td></tr>
-                                <tr><td><label class="watr-check"><input type="checkbox" id="mf-2" aria-label="select old-site.tar.gz"></label></td><td><b>old-site.tar.gz</b></td><td class="num" data-sort="163577856">156 MB</td><td class="muted">watrboi</td><td class="num">2026-08-11</td><td><span class="watr-tag watr-tag--bright">public</span></td></tr>
-                                <tr><td><label class="watr-check"><input type="checkbox" id="mf-3" aria-label="select watrlabs-logo.psd"></label></td><td><b>watrlabs-logo.psd</b></td><td class="num" data-sort="24222105">23.1 MB</td><td class="muted">watrboi</td><td class="num">2026-07-30</td><td><span class="watr-tag">private</span></td></tr>
-                                <tr><td><label class="watr-check"><input type="checkbox" id="mf-4" aria-label="select notes.txt"></label></td><td><b>notes.txt</b></td><td class="num" data-sort="2048">2 KB</td><td class="muted">sword</td><td class="num">2026-06-04</td><td><span class="watr-tag watr-tag--warning">expires friday</span></td></tr>
+                                <tr class="is-selected"><td><label class="watr-check"><input type="checkbox" id="mf-0" aria-label="select backup.zip" checked></label></td><td class="is-main">backup.zip</td><td class="num" data-sort="13002342">12.4 MB</td><td class="muted">sword</td><td class="num">2026-10-02</td><td><span class="watr-tag watr-tag--bright">public</span></td></tr>
+                                <tr><td><label class="watr-check"><input type="checkbox" id="mf-1" aria-label="select centipede.png"></label></td><td class="is-main">centipede.png</td><td class="num" data-sort="860160">840 KB</td><td class="muted">sword</td><td class="num">2026-09-28</td><td><span class="watr-tag">private</span></td></tr>
+                                <tr><td><label class="watr-check"><input type="checkbox" id="mf-2" aria-label="select old-site.tar.gz"></label></td><td class="is-main">old-site.tar.gz</td><td class="num" data-sort="163577856">156 MB</td><td class="muted">watrboi</td><td class="num">2026-08-11</td><td><span class="watr-tag watr-tag--bright">public</span></td></tr>
+                                <tr><td><label class="watr-check"><input type="checkbox" id="mf-3" aria-label="select watrlabs-logo.psd"></label></td><td class="is-main">watrlabs-logo.psd</td><td class="num" data-sort="24222105">23.1 MB</td><td class="muted">watrboi</td><td class="num">2026-07-30</td><td><span class="watr-tag">private</span></td></tr>
+                                <tr><td><label class="watr-check"><input type="checkbox" id="mf-4" aria-label="select notes.txt"></label></td><td class="is-main">notes.txt</td><td class="num" data-sort="2048">2 KB</td><td class="muted">sword</td><td class="num">2026-06-04</td><td><span class="watr-tag watr-tag--warning">expires friday</span></td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -622,16 +637,16 @@
     <section id="voice">
         <h2>voice</h2>
         <p class="lede">Lowercase where it's chrome, normal case where it's a sentence. Plain about what happened, a little weird around the edges.</p>
-        <div class="table-wrap">
-            <table class="voice">
+        <div class="watr-table-wrap" style="margin-top: 15px;">
+            <table class="watr-table watr-table--stack voice">
                 <thead><tr><th>where</th><th>like this</th><th>not this</th></tr></thead>
                 <tbody>
-                    <tr><td>nav links</td><td>home · files · accounts</td><td>Home · My Files · Account Settings</td></tr>
-                    <tr><td>buttons</td><td>Go back · Upload · Delete file</td><td>Submit · OK · Click here</td></tr>
-                    <tr><td>errors</td><td>Your passwords do not match.</td><td>Oops! Something went wrong 😅</td></tr>
-                    <tr><td>server errors</td><td>An issue occurred on our side! Try again later. + panic blob</td><td>Error 500: Internal Server Error</td></tr>
-                    <tr><td>side panels</td><td>one in-joke quote with a fake attribution, like "- sword 2026"</td><td>a marketing blurb about the product</td></tr>
-                    <tr><td>notices</td><td>This site is incomplete!</td><td>We're working hard to bring you an amazing experience</td></tr>
+                    <tr><td class="is-main">nav links</td><td>home · files · accounts</td><td class="muted">Home · My Files · Account Settings</td></tr>
+                    <tr><td class="is-main">buttons</td><td>Go back · Upload · Delete file</td><td class="muted">Submit · OK · Click here</td></tr>
+                    <tr><td class="is-main">errors</td><td>Your passwords do not match.</td><td class="muted">Oops! Something went wrong 😅</td></tr>
+                    <tr><td class="is-main">server errors</td><td>An issue occurred on our side! Try again later. + panic blob</td><td class="muted">Error 500: Internal Server Error</td></tr>
+                    <tr><td class="is-main">side panels</td><td>one in-joke quote with a fake attribution, like "- sword 2026"</td><td class="muted">a marketing blurb about the product</td></tr>
+                    <tr><td class="is-main">notices</td><td>This site is incomplete!</td><td class="muted">We're working hard to bring you an amazing experience</td></tr>
                 </tbody>
             </table>
         </div>
