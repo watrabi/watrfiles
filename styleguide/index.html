@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>watr style</title>
+<link rel="icon" href="assets/WatrLabsIcon.png">
+<link rel="stylesheet" href="watr.css">
+<style>
+    /* layout for this page only. the look itself all comes from watr.css */
+    .page {
+        width: 100%;
+        max-width: 980px;
+        margin-inline: auto;
+        padding-inline: 16px;
+        padding-block: 10px 60px;
+        box-sizing: border-box;
+    }
+    section { padding-top: 30px; scroll-margin-top: 10px; }
+    section > h2 { margin-bottom: 0.25rem; }
+    .lede { max-width: 62ch; line-height: 1.6; color: var(--watr-muted); margin-top: 0; }
+    p, li { line-height: 1.6; }
+    code, pre { font-family: ui-monospace, "Cascadia Mono", Menlo, Consolas, monospace; font-size: 0.85rem; }
+    :not(pre) > code { background-color: var(--watr-field); padding: 1px 5px; border-radius: var(--watr-field-radius); }
+
+    /* knobs */
+    .tuner { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 30px; align-items: start; }
+    .knob { display: grid; grid-template-columns: 7.5rem minmax(0, 1fr) 3.5rem; gap: 10px; align-items: center; margin-bottom: 12px; }
+    .knob label { font-weight: 600; }
+    .knob output { font-variant-numeric: tabular-nums; text-align: right; color: var(--watr-muted); }
+    .knob input[type="range"] { padding: 0; background: transparent; accent-color: var(--watr-mid); width: 100%; }
+    .presets { margin-top: 18px; }
+    .presets p { margin: 0 0 6px; font-size: 0.85rem; color: var(--watr-muted); }
+    .presets .watr-btn[aria-pressed="true"] { box-shadow: inset 0 0 0 3px var(--watr-ink); }
+    .snippet pre { margin: 0; padding: 15px; overflow-x: auto; background-color: var(--watr-surface); color: var(--watr-text); }
+    .snippet .watr-row { margin-top: 8px; justify-content: space-between; }
+    .snippet small { color: var(--watr-muted); }
+
+    /* ramp */
+    .ramp { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 15px; margin-top: 15px; }
+    .chip { box-shadow: var(--watr-drop); background-color: var(--watr-page); }
+    .chip__fill { height: 80px; }
+    .chip__text { padding: 8px 10px; font-size: 0.85rem; }
+    .chip__text b { display: block; }
+    .chip__text span { color: var(--watr-muted); font-variant-numeric: tabular-nums; }
+    .ramp--small { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+    .ramp--small .chip__fill { height: 40px; }
+
+    /* signatures */
+    .sigs { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 30px 25px; margin-top: 20px; }
+    .sig h3 { margin: 12px 0 2px; font-size: 1.05rem; }
+    .sig p { margin: 0; font-size: 0.92rem; color: var(--watr-muted); }
+    .sig__demo { height: 120px; background-color: var(--watr-surface); display: flex; align-items: center; justify-content: center; gap: 10px; overflow: hidden; position: relative; }
+    .mini-page { width: 150px; height: 96px; background-color: var(--watr-page); display: flex; flex-direction: column; box-shadow: var(--watr-drop); }
+    .mini-page i { display: block; }
+    .mini-page .b { height: 12px; background-color: var(--watr-bar); box-shadow: 2px 2px 2px var(--watr-shadow-color); position: relative; z-index: 2; }
+    .mini-page .s { height: 7px; background-color: var(--watr-danger); box-shadow: 2px 2px 2px var(--watr-shadow-color); position: relative; z-index: 1; }
+    .mini-page .f { height: 12px; margin-top: auto; background-color: var(--watr-bar); }
+    .mini-page .l { height: 4px; width: 60%; margin: 10px 0 0 12px; background-color: var(--watr-field-over); }
+    .mini-page .l + .l { width: 40%; margin-top: 5px; }
+    .lift-demo { width: 60px; height: 60px; background-color: var(--watr-bright); box-shadow: var(--watr-drop-big); }
+    .lift-demo + .lift-demo { background-color: var(--watr-page); box-shadow: var(--watr-drop); }
+    .ramp-demo { display: flex; height: 60px; width: 180px; }
+    .ramp-demo i { flex: 1; }
+    .rule-demo { display: flex; align-items: center; font-size: 0.8rem; }
+    .rule-demo div:first-child { border-right: var(--watr-rule-w) solid var(--watr-rule); padding-right: 14px; text-align: right; }
+    .rule-demo div:last-child { padding-left: 14px; display: grid; gap: 4px; }
+    .rule-demo span { display: block; width: 70px; height: 12px; background-color: var(--watr-field); border-radius: var(--watr-field-radius); }
+    .rule-demo span:last-child { background-color: var(--watr-bright); border-radius: 0; width: 40px; }
+    .speed-demo { width: 50px; height: 50px; background-color: var(--watr-bright); box-shadow: var(--watr-drop); }
+    .sig__demo:hover .speed-demo { transform: translate(-6px, -6px); box-shadow: calc(var(--watr-lift) + 6px) calc(var(--watr-lift) + 6px) var(--watr-lift) var(--watr-shadow-color); background-color: var(--watr-mid); }
+    .voice-demo { font-size: 1.05rem; text-align: left; }
+    .voice-demo b { display: block; }
+
+    /* parts */
+    .parts { display: grid; gap: 35px; margin-top: 20px; }
+    .part > h3 { margin: 0 0 10px; font-size: 1rem; }
+    .part > h3 code { font-weight: 400; margin-left: 6px; }
+    .stage { background-color: var(--watr-page); outline: 1px dashed var(--watr-field-over); outline-offset: 0; padding: 25px; }
+    .stage--flush { padding: 0; display: flex; flex-direction: column; }
+    .stage--flush .watr-footer { margin-top: 0; }
+    .stage .watr-bar, .stage .watr-strip, .stage .watr-footer { position: static; }
+    .fields { display: grid; gap: 5px; max-width: 240px; }
+
+    /* voice */
+    .voice { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    .voice th, .voice td { text-align: left; vertical-align: top; padding: 10px 12px; }
+    .voice thead th { background-color: var(--watr-bar); color: var(--watr-on-bar); }
+    .voice tbody tr:nth-child(even) { background-color: var(--watr-surface); }
+    .voice td:first-child { font-weight: 600; width: 22%; }
+    .voice td:last-child { color: var(--watr-muted); }
+    .table-wrap { overflow-x: auto; box-shadow: var(--watr-drop); }
+
+    /* recipe */
+    .recipe { max-width: 70ch; padding-left: 1.4em; }
+    .recipe li { margin-bottom: 8px; }
+    .recipe li::marker { font-weight: 800; color: var(--watr-mid); }
+
+    .theme-btn { font: inherit; font-weight: 600; background: none; border: none; color: var(--watr-on-bar); cursor: pointer; padding: 5px; text-transform: lowercase; }
+    .theme-btn:hover { text-decoration: underline; text-underline-offset: 4px; }
+
+    @media (max-width: 760px) {
+        .tuner { grid-template-columns: minmax(0, 1fr); }
+        .ramp { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+</style>
+</head>
+<body>
+
+<nav class="watr-bar" aria-label="sections">
+    <div class="watr-bar__group">
+        <a href="#top" class="watr-bar__home">watr style</a>
+        <a href="#knobs">knobs</a>
+        <a href="#keep">keep</a>
+        <a href="#parts">parts</a>
+        <a href="#voice">voice</a>
+        <a href="#new-site">new site</a>
+    </div>
+    <div class="watr-bar__group">
+        <button class="theme-btn" id="theme-toggle" type="button">dark</button>
+    </div>
+</nav>
+<div class="watr-strip watr-strip--warning">
+    <p>This guide is incomplete! It's version 0.1, keep poking at it.</p>
+</div>
+
+<main class="page" id="top">
+
+    <section>
+        <h1>the watr style</h1>
+        <p class="lede">How my sites look, written down so every new one starts from the same place. One hue at four depths, square buttons, soft fields, and shadows that always fall down and to the right. The hue, the intensity and the depth change from site to site. The rest stays put, and that's how you can tell it's mine.</p>
+    </section>
+
+    <section id="knobs">
+        <h2>knobs</h2>
+        <p class="lede">These change per site. Drag them and the whole page follows. When it feels right, copy the snippet into the new site's CSS after <code>watr.css</code>.</p>
+
+        <div class="tuner">
+            <div>
+                <div class="knob">
+                    <label for="k-hue">hue</label>
+                    <input type="range" id="k-hue" min="0" max="359" step="1" value="196">
+                    <output for="k-hue" id="o-hue">196</output>
+                </div>
+                <div class="knob">
+                    <label for="k-chroma">intensity</label>
+                    <input type="range" id="k-chroma" min="0.3" max="1.4" step="0.05" value="1">
+                    <output for="k-chroma" id="o-chroma">1</output>
+                </div>
+                <div class="knob">
+                    <label for="k-lift">lift</label>
+                    <input type="range" id="k-lift" min="0" max="12" step="1" value="5">
+                    <output for="k-lift" id="o-lift">5px</output>
+                </div>
+                <div class="knob">
+                    <label for="k-weight">heading weight</label>
+                    <input type="range" id="k-weight" min="400" max="900" step="100" value="700">
+                    <output for="k-weight" id="o-weight">700</output>
+                </div>
+
+                <div class="presets">
+                    <p>real sites</p>
+                    <div class="watr-row" id="presets-real">
+                        <button type="button" class="watr-btn" data-hue="196" data-chroma="1" data-lift="5" data-weight="700">watrfiles</button>
+                        <button type="button" class="watr-btn" data-hue="237" data-chroma="1.05" data-lift="5" data-weight="700">watrlabs logo</button>
+                    </div>
+                    <p style="margin-top: 12px;">made-up examples, to show how far the knobs go</p>
+                    <div class="watr-row" id="presets-example">
+                        <button type="button" class="watr-btn" data-hue="32" data-chroma="1.1" data-lift="8" data-weight="900">loud orange</button>
+                        <button type="button" class="watr-btn" data-hue="150" data-chroma="0.55" data-lift="3" data-weight="500">calm green</button>
+                        <button type="button" class="watr-btn" data-hue="300" data-chroma="0.9" data-lift="6" data-weight="800">purple</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="snippet">
+                <pre id="snippet" aria-label="CSS for these settings"></pre>
+                <div class="watr-row">
+                    <small id="copy-note">paste after watr.css</small>
+                    <button type="button" class="watr-btn watr-btn--quiet" id="copy">copy</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="ramp" aria-label="the water ramp">
+            <div class="chip"><div class="chip__fill" style="background: var(--watr-bright)"></div><div class="chip__text"><b>bright</b><span data-swatch="78% 0.13">-</span></div></div>
+            <div class="chip"><div class="chip__fill" style="background: var(--watr-mid)"></div><div class="chip__text"><b>mid</b><span data-swatch="69% 0.11">-</span></div></div>
+            <div class="chip"><div class="chip__fill" style="background: var(--watr-bar)"></div><div class="chip__text"><b>bar</b><span data-swatch="64% 0.10">-</span></div></div>
+            <div class="chip"><div class="chip__fill" style="background: var(--watr-deep)"></div><div class="chip__text"><b>deep</b><span data-swatch="41% 0.07">-</span></div></div>
+        </div>
+        <div class="ramp ramp--small">
+            <div class="chip"><div class="chip__fill" style="background: var(--watr-page)"></div><div class="chip__text"><b>page</b></div></div>
+            <div class="chip"><div class="chip__fill" style="background: var(--watr-surface)"></div><div class="chip__text"><b>surface</b></div></div>
+            <div class="chip"><div class="chip__fill" style="background: var(--watr-field)"></div><div class="chip__text"><b>field</b></div></div>
+            <div class="chip"><div class="chip__fill" style="background: var(--watr-text)"></div><div class="chip__text"><b>text</b></div></div>
+            <div class="chip"><div class="chip__fill" style="background: var(--watr-danger)"></div><div class="chip__text"><b>danger</b><span>#cc2828</span></div></div>
+            <div class="chip"><div class="chip__fill" style="background: var(--watr-warning)"></div><div class="chip__text"><b>warning</b><span>#ffc800</span></div></div>
+        </div>
+    </section>
+
+    <section id="keep">
+        <h2>keep</h2>
+        <p class="lede">The signature. Every site gets all of these, whatever the knobs say.</p>
+
+        <div class="sigs">
+            <div class="sig">
+                <div class="sig__demo"><div class="ramp-demo"><i style="background: var(--watr-bright)"></i><i style="background: var(--watr-mid)"></i><i style="background: var(--watr-bar)"></i><i style="background: var(--watr-deep)"></i></div></div>
+                <h3>one hue, four depths</h3>
+                <p>Bright for buttons, mid for hover, bar for the frame, deep for disabled. No second accent. Red and yellow only ever mean danger and warning.</p>
+            </div>
+            <div class="sig">
+                <div class="sig__demo"><div class="lift-demo"></div><div class="lift-demo"></div></div>
+                <h3>light from the top-left</h3>
+                <p>Every raised thing casts its shadow down and to the right, equal x, y and blur. Never a soft glow all around.</p>
+            </div>
+            <div class="sig">
+                <div class="sig__demo"><div class="mini-page"><i class="b"></i><i class="s"></i><i class="l"></i><i class="l"></i><i class="f"></i></div></div>
+                <h3>framed by bars</h3>
+                <p>A full-width bar on top, optional notice strips stacked under it, a bar at the bottom. Each one casts onto the next.</p>
+            </div>
+            <div class="sig">
+                <div class="sig__demo"><div class="rule-demo"><div><b>login</b><br>the watr files</div><div><span></span><span></span><span></span></div></div></div>
+                <h3>the thick rule</h3>
+                <p>Two-sided layouts put words on the left and the thing on the right, split by a thick ink line. On phones the rule goes flat.</p>
+            </div>
+            <div class="sig">
+                <div class="sig__demo"><div class="rule-demo"><div style="border: none; padding: 0;"><span style="background: var(--watr-field); border-radius: var(--watr-field-radius); width: 90px; height: 28px;"></span></div><div><span style="width: 70px; height: 28px;"></span></div></div></div>
+                <h3>square buttons, soft fields</h3>
+                <p>Buttons have hard corners and black text on bright. Fields are filled grey, no border, slightly rounded. The contrast between the two is the point.</p>
+            </div>
+            <div class="sig">
+                <div class="sig__demo"><img src="assets/thinking.png" alt="" width="80" height="80"><img src="assets/blobpanic.png" alt="" width="80" height="80"></div>
+                <h3>the blob</h3>
+                <p>Error and empty states get a big expressive blob emoji beside the message. Each site can pick its own face.</p>
+            </div>
+            <div class="sig">
+                <div class="sig__demo"><div class="voice-demo"><b>home &nbsp;files &nbsp;accounts</b><i>- sword 2026</i></div></div>
+                <h3>lowercase, deadpan</h3>
+                <p>Nav and labels in lowercase. Copy says what happened in plain words, with one in-joke per page at most.</p>
+            </div>
+            <div class="sig">
+                <div class="sig__demo"><div class="speed-demo"></div></div>
+                <h3>everything moves at 0.2s</h3>
+                <p>Hover, open, close, theme change: one speed for all of it. Hover this box. Turned off for people who ask for reduced motion.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="parts">
+        <h2>parts</h2>
+        <p class="lede">The pieces in <code>watr.css</code>. Class names are under each heading.</p>
+
+        <div class="parts">
+            <div class="part">
+                <h3>frame <code>.watr-bar .watr-strip .watr-footer</code></h3>
+                <div class="stage stage--flush">
+                    <div class="watr-bar">
+                        <div class="watr-bar__group"><a href="#parts" class="watr-bar__home">watrfiles</a><a href="#parts">home</a><a href="#parts">files</a></div>
+                        <div class="watr-bar__group"><a href="#parts">accounts</a><a href="#parts">sword</a></div>
+                    </div>
+                    <div class="watr-strip"><p>This site is incomplete!</p></div>
+                    <div class="watr-strip watr-strip--info"><p>Maintenance tonight at 11pm.</p></div>
+                    <div style="height: 70px;"></div>
+                    <div class="watr-footer">©watrfiles - 2026</div>
+                </div>
+            </div>
+
+            <div class="part">
+                <h3>buttons and fields <code>.watr-btn</code></h3>
+                <div class="stage watr-stack" style="gap: 15px;">
+                    <div class="watr-row">
+                        <button type="button" class="watr-btn">Upload</button>
+                        <button type="button" class="watr-btn watr-btn--quiet">Cancel</button>
+                        <button type="button" class="watr-btn watr-btn--danger">Delete file</button>
+                        <button type="button" class="watr-btn" disabled>Uploading...</button>
+                    </div>
+                    <div class="fields">
+                        <input type="text" id="demo-user" placeholder="username" autocomplete="off">
+                        <input type="password" id="demo-pass" placeholder="password" autocomplete="off">
+                    </div>
+                </div>
+            </div>
+
+            <div class="part">
+                <h3>messages <code>.watr-msg</code></h3>
+                <div class="stage watr-stack" style="align-items: stretch;">
+                    <div class="watr-msg">Your passwords do not match.</div>
+                    <div class="watr-msg watr-msg--warning">This file is over 50 MB and will take a while.</div>
+                    <div class="watr-msg watr-msg--info">Saved. Your profile is up to date.</div>
+                </div>
+            </div>
+
+            <div class="part">
+                <h3>split <code>.watr-split</code></h3>
+                <div class="stage">
+                    <div class="watr-split">
+                        <div class="watr-split__aside">
+                            <h1>Login</h1>
+                            <blockquote class="watr-quote">
+                                <b>the watr files</b><br>
+                                so basically like you<br>
+                                know when like the centipedes<br>🐛
+                                <cite>sword 2026</cite>
+                            </blockquote>
+                        </div>
+                        <form class="watr-split__main watr-stack" onsubmit="event.preventDefault()">
+                            <input type="text" id="split-user" placeholder="username" autocomplete="off">
+                            <input type="password" id="split-pass" placeholder="password" autocomplete="off">
+                            <button type="submit" class="watr-btn" style="margin-top: 10px;">Login</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="part">
+                <h3>blob <code>.watr-blob</code></h3>
+                <div class="stage">
+                    <div class="watr-blob">
+                        <div>
+                            <h1>404 - Page Not Found</h1>
+                            <p>Couldn't find this page, maybe try again later?</p>
+                            <div class="watr-row">
+                                <a class="watr-btn" href="#parts">Go back</a>
+                                <a class="watr-btn" href="#top">Go home</a>
+                            </div>
+                        </div>
+                        <img class="watr-blob__face" src="assets/thinking.png" alt="Thinking face emoji" width="180" height="180">
+                    </div>
+                </div>
+            </div>
+
+            <div class="part">
+                <h3>panel <code>.watr-panel</code></h3>
+                <div class="stage">
+                    <div class="watr-panel" style="max-width: 360px;">
+                        <b>backup.zip</b>
+                        <p style="margin: 4px 0 12px; color: var(--watr-muted);">12.4 MB · uploaded by sword</p>
+                        <div class="watr-row"><a class="watr-btn" href="#parts">Download</a><a class="watr-btn watr-btn--quiet" href="#parts">Share</a></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="voice">
+        <h2>voice</h2>
+        <p class="lede">Lowercase where it's chrome, normal case where it's a sentence. Plain about what happened, a little weird around the edges.</p>
+        <div class="table-wrap">
+            <table class="voice">
+                <thead><tr><th>where</th><th>like this</th><th>not this</th></tr></thead>
+                <tbody>
+                    <tr><td>nav links</td><td>home · files · accounts</td><td>Home · My Files · Account Settings</td></tr>
+                    <tr><td>buttons</td><td>Go back · Upload · Delete file</td><td>Submit · OK · Click here</td></tr>
+                    <tr><td>errors</td><td>Your passwords do not match.</td><td>Oops! Something went wrong 😅</td></tr>
+                    <tr><td>server errors</td><td>An issue occurred on our side! Try again later. + panic blob</td><td>Error 500: Internal Server Error</td></tr>
+                    <tr><td>side panels</td><td>one in-joke quote with a fake attribution, like "- sword 2026"</td><td>a marketing blurb about the product</td></tr>
+                    <tr><td>notices</td><td>This site is incomplete!</td><td>We're working hard to bring you an amazing experience</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section id="new-site">
+        <h2>new site</h2>
+        <p class="lede">Do these in order when starting something new.</p>
+        <ol class="recipe">
+            <li>Link <code>watr.css</code> before your own CSS.</li>
+            <li>Pick a hue at least 40° away from your other live sites (watrfiles is 196, the watrlabs logo is 237) and set it with the knobs above.</li>
+            <li>Decide how loud it is: intensity, lift and heading weight. Change at least one of them from the last site you made.</li>
+            <li>Pick the layout: bar + sidebar for an app, split for auth and landing pages, one column for docs.</li>
+            <li>Pick this site's blob for the 404 and 500 pages, and write its one quote.</li>
+            <li>Check the keep list. If something on it is missing, add it back before shipping.</li>
+        </ol>
+    </section>
+
+</main>
+
+<footer class="watr-footer">©watr style - 2026</footer>
+
+<script>
+    const root = document.documentElement;
+    const knobs = {
+        hue:    { input: document.getElementById("k-hue"),    out: document.getElementById("o-hue"),    prop: "--watr-hue",         unit: "" },
+        chroma: { input: document.getElementById("k-chroma"), out: document.getElementById("o-chroma"), prop: "--watr-chroma",      unit: "" },
+        lift:   { input: document.getElementById("k-lift"),   out: document.getElementById("o-lift"),   prop: "--watr-lift",        unit: "px" },
+        weight: { input: document.getElementById("k-weight"), out: document.getElementById("o-weight"), prop: "--watr-head-weight", unit: "" }
+    };
+    const snippet = document.getElementById("snippet");
+    const presetButtons = document.querySelectorAll("[data-hue]");
+
+    function render() {
+        for (const k of Object.values(knobs)) {
+            const v = k.input.value + k.unit;
+            k.out.textContent = v;
+            root.style.setProperty(k.prop, v);
+        }
+        const hue = knobs.hue.input.value;
+        const chroma = parseFloat(knobs.chroma.input.value);
+        document.querySelectorAll("[data-swatch]").forEach(function (el) {
+            const parts = el.dataset.swatch.split(" ");
+            el.textContent = "oklch(" + parts[0] + " " + (parseFloat(parts[1]) * chroma).toFixed(3) + " " + hue + ")";
+        });
+        snippet.textContent =
+            ":root {\n" +
+            "    --watr-hue: " + hue + ";\n" +
+            "    --watr-chroma: " + knobs.chroma.input.value + ";\n" +
+            "    --watr-lift: " + knobs.lift.input.value + "px;\n" +
+            "    --watr-head-weight: " + knobs.weight.input.value + ";\n" +
+            "}";
+        presetButtons.forEach(function (b) {
+            const match = b.dataset.hue === hue && parseFloat(b.dataset.chroma) === chroma &&
+                b.dataset.lift === knobs.lift.input.value && b.dataset.weight === knobs.weight.input.value;
+            b.setAttribute("aria-pressed", match ? "true" : "false");
+        });
+    }
+
+    for (const k of Object.values(knobs)) k.input.addEventListener("input", render);
+
+    presetButtons.forEach(function (b) {
+        b.addEventListener("click", function () {
+            knobs.hue.input.value = b.dataset.hue;
+            knobs.chroma.input.value = b.dataset.chroma;
+            knobs.lift.input.value = b.dataset.lift;
+            knobs.weight.input.value = b.dataset.weight;
+            render();
+        });
+    });
+
+    const copyBtn = document.getElementById("copy");
+    const copyNote = document.getElementById("copy-note");
+    copyBtn.addEventListener("click", function () {
+        const done = function () { copyNote.textContent = "copied"; };
+        const fallback = function () {
+            const range = document.createRange();
+            range.selectNodeContents(snippet);
+            const sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+            copyNote.textContent = "selected, press ctrl+c";
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(snippet.textContent).then(done, fallback);
+        } else {
+            fallback();
+        }
+    });
+
+    const themeBtn = document.getElementById("theme-toggle");
+    function isDark() {
+        const set = root.getAttribute("data-theme");
+        if (set) return set === "dark";
+        return window.matchMedia("(prefers-color-scheme: dark)").matches;
+    }
+    function syncThemeLabel() { themeBtn.textContent = isDark() ? "light" : "dark"; }
+    themeBtn.addEventListener("click", function () {
+        root.setAttribute("data-theme", isDark() ? "light" : "dark");
+        syncThemeLabel();
+    });
+    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", syncThemeLabel);
+
+    render();
+    syncThemeLabel();
+</script>
+</body>
+</html>

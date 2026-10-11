@@ -1,0 +1,357 @@
+/*
+    watr.css — the watr style, portable edition
+    drop it into any site, then retune the knobs in your own :root.
+    everything lives in @layer watr, so any normal css you write wins.
+*/
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+@layer watr.tokens, watr.base, watr.components;
+
+/* ---------- knobs: change these per site ---------- */
+@layer watr.tokens {
+    :root {
+        --watr-hue: 196;          /* the one color. watrfiles = 196, watrlabs = 237 */
+        --watr-chroma: 1;         /* 0.4 = calm, 1 = normal, 1.3 = loud */
+        --watr-lift: 5px;         /* how far things float. 3px flat, 5px normal, 8px dramatic */
+        --watr-head-weight: 700;  /* heading weight. 500 calm, 700 normal, 900 shouty */
+        --watr-speed: 0.2s;       /* everything moves at this speed */
+    }
+
+    /* ---------- derived: don't edit these, edit the knobs ---------- */
+    /* add .watr-scope to any element to re-hue just that part of the page */
+    :root, .watr-scope {
+        /* the water ramp: one hue, four depths */
+        --watr-bright: oklch(78% calc(0.13 * var(--watr-chroma)) var(--watr-hue));
+        --watr-mid:    oklch(69% calc(0.11 * var(--watr-chroma)) var(--watr-hue));
+        --watr-bar:    oklch(64% calc(0.10 * var(--watr-chroma)) var(--watr-hue));
+        --watr-deep:   oklch(41% calc(0.07 * var(--watr-chroma)) var(--watr-hue));
+
+        /* neutrals lean a tiny bit toward the hue so every site feels its own */
+        --watr-page:       #ffffff;
+        --watr-surface:    oklch(95.8% 0.004 var(--watr-hue));
+        --watr-panel:      oklch(91% 0.004 var(--watr-hue));
+        --watr-field:      oklch(90.7% 0.004 var(--watr-hue));
+        --watr-field-over: oklch(79% 0.006 var(--watr-hue));
+        --watr-text:       oklch(16% 0.012 var(--watr-hue));
+        --watr-muted:      oklch(42% 0.012 var(--watr-hue));
+        --watr-ink:        oklch(14% 0.015 var(--watr-hue));  /* text on bright fills, in both themes */
+        --watr-on-bar:     #ffffff;
+        --watr-rule:       var(--watr-text);
+
+        /* signals. these never follow the hue */
+        --watr-danger:  #cc2828;
+        --watr-warning: #ffc800;
+
+        /* the drop: light always comes from the top-left */
+        --watr-shadow-color: rgb(15 15 15 / 0.4);
+        --watr-drop:      var(--watr-lift) var(--watr-lift) var(--watr-lift) var(--watr-shadow-color);
+        --watr-drop-big:  calc(var(--watr-lift) * 2) calc(var(--watr-lift) * 2) calc(var(--watr-lift) * 2) var(--watr-shadow-color);
+
+        --watr-font: "Montserrat", "Segoe UI", system-ui, sans-serif;
+        --watr-bar-h: 45px;
+        --watr-foot-h: 50px;
+        --watr-field-radius: 0.3em;
+        --watr-rule-w: 5px;
+        --watr-sidebar-w: 250px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]), :root:not([data-theme="light"]) .watr-scope {
+            --watr-page:       oklch(19% 0.012 var(--watr-hue));
+            --watr-surface:    oklch(23% 0.014 var(--watr-hue));
+            --watr-panel:      oklch(26% 0.016 var(--watr-hue));
+            --watr-field:      oklch(30% 0.016 var(--watr-hue));
+            --watr-field-over: oklch(37% 0.02 var(--watr-hue));
+            --watr-text:       oklch(94% 0.008 var(--watr-hue));
+            --watr-muted:      oklch(74% 0.012 var(--watr-hue));
+            --watr-bar:        oklch(50% calc(0.09 * var(--watr-chroma)) var(--watr-hue));
+            --watr-shadow-color: rgb(0 0 0 / 0.55);
+            color-scheme: dark;
+        }
+    }
+    :root[data-theme="dark"], :root[data-theme="dark"] .watr-scope {
+        --watr-page:       oklch(19% 0.012 var(--watr-hue));
+        --watr-surface:    oklch(23% 0.014 var(--watr-hue));
+        --watr-panel:      oklch(26% 0.016 var(--watr-hue));
+        --watr-field:      oklch(30% 0.016 var(--watr-hue));
+        --watr-field-over: oklch(37% 0.02 var(--watr-hue));
+        --watr-text:       oklch(94% 0.008 var(--watr-hue));
+        --watr-muted:      oklch(74% 0.012 var(--watr-hue));
+        --watr-bar:        oklch(50% calc(0.09 * var(--watr-chroma)) var(--watr-hue));
+        --watr-shadow-color: rgb(0 0 0 / 0.55);
+        color-scheme: dark;
+    }
+}
+
+/* ---------- base ---------- */
+@layer watr.base {
+    *, *::before, *::after {
+        transition: var(--watr-speed);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        :root { --watr-speed: 0s; }
+    }
+
+    html, body {
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+    }
+
+    body {
+        font-family: var(--watr-font);
+        background-color: var(--watr-page);
+        color: var(--watr-text);
+        display: flex;
+        flex-direction: column;
+    }
+
+    h1, h2, h3 {
+        font-weight: var(--watr-head-weight);
+        text-wrap: balance;
+    }
+
+    h1 { margin-bottom: 0.25rem; }
+
+    a { color: inherit; }
+
+    input, select, textarea {
+        font: inherit;
+        color: var(--watr-text);
+        background-color: var(--watr-field);
+        border: none;
+        padding: 10px;
+        border-radius: var(--watr-field-radius);
+    }
+
+    input:hover, select:hover, textarea:hover {
+        background-color: var(--watr-field-over);
+    }
+
+    :focus-visible {
+        outline: 3px solid var(--watr-bright);
+        outline-offset: 2px;
+    }
+
+    ::selection {
+        background-color: var(--watr-bright);
+        color: var(--watr-ink);
+    }
+}
+
+/* ---------- components ---------- */
+@layer watr.components {
+
+    /* bars: the page is framed top and bottom by full-width color */
+    .watr-bar {
+        color: var(--watr-on-bar);
+        background-color: var(--watr-bar);
+        min-height: var(--watr-bar-h);
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: var(--watr-drop);
+        position: relative;
+        z-index: 3;
+    }
+
+    .watr-bar__group {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        padding-inline: 15px;
+    }
+
+    .watr-bar a {
+        color: var(--watr-on-bar);
+        text-decoration: none;
+        padding: 5px;
+        font-weight: 600;
+        white-space: nowrap;
+        text-transform: lowercase;
+    }
+
+    .watr-bar a:hover { text-decoration: underline; text-underline-offset: 4px; }
+
+    .watr-bar .watr-bar__home { text-transform: none; }
+
+    .watr-footer {
+        color: var(--watr-on-bar);
+        background-color: var(--watr-bar);
+        min-height: var(--watr-foot-h);
+        margin-top: auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        box-shadow: var(--watr-drop-big);
+    }
+
+    /* strips: thin full-width notices stacked right under the bar */
+    .watr-strip {
+        color: #ffffff;
+        background-color: var(--watr-danger);
+        min-height: var(--watr-bar-h);
+        display: flex;
+        align-items: center;
+        padding-inline: 15px;
+        box-shadow: var(--watr-drop);
+        position: relative;
+        z-index: 2;
+    }
+    .watr-strip p { margin: 0; }
+    .watr-strip--warning { background-color: var(--watr-warning); color: var(--watr-ink); }
+    .watr-strip--info    { background-color: var(--watr-bright);  color: var(--watr-ink); }
+
+    /* buttons: square, bright, black text. never rounded */
+    .watr-btn {
+        display: inline-block;
+        font: inherit;
+        background-color: var(--watr-bright);
+        color: var(--watr-ink);
+        text-decoration: none;
+        padding: 10px;
+        border: none;
+        border-radius: 0;
+        cursor: pointer;
+    }
+    .watr-btn:hover { background-color: var(--watr-mid); }
+    .watr-btn:active { transform: translate(1px, 1px); }
+    .watr-btn--danger { background-color: var(--watr-danger); color: #ffffff; }
+    .watr-btn--danger:hover { background-color: color-mix(in oklch, var(--watr-danger), black 20%); }
+    .watr-btn--quiet { background-color: var(--watr-field); color: var(--watr-text); }
+    .watr-btn--quiet:hover { background-color: var(--watr-field-over); }
+    .watr-btn:disabled, .watr-btn[aria-disabled="true"] {
+        background-color: var(--watr-deep);
+        color: color-mix(in oklch, var(--watr-deep), white 60%);
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .watr-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        align-items: center;
+    }
+
+    .watr-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        align-items: flex-start;
+    }
+
+    /* messages: a solid block of signal color, no icon, no border */
+    .watr-msg {
+        padding: 10px;
+        color: #ffffff;
+        background-color: var(--watr-danger);
+    }
+    .watr-msg--warning { background-color: var(--watr-warning); color: var(--watr-ink); }
+    .watr-msg--info    { background-color: var(--watr-bright);  color: var(--watr-ink); }
+
+    /* panel: a raised block that casts the drop */
+    .watr-panel {
+        background-color: var(--watr-panel);
+        box-shadow: var(--watr-drop);
+        padding: 20px;
+    }
+
+    /* split: words on one side, the thing on the other, a thick rule between */
+    .watr-split {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .watr-split__aside {
+        border-right: var(--watr-rule-w) solid var(--watr-rule);
+        padding-right: 40px;
+        text-align: left;
+    }
+    .watr-split__main {
+        padding-left: 40px;
+    }
+
+    @media (max-width: 480px) {
+        .watr-split { flex-direction: column; align-items: stretch; }
+        .watr-split__aside {
+            border-right: none;
+            border-bottom: var(--watr-rule-w) solid var(--watr-rule);
+            padding: 0 0 20px;
+        }
+        .watr-split__main { padding: 20px 0 0; }
+    }
+
+    /* blob: an expressive face sits beside the message, never above it on desktop */
+    .watr-blob {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 35px;
+        text-align: left;
+    }
+    .watr-blob__face {
+        width: 180px;
+        height: auto;
+        flex: none;
+    }
+    @media (max-width: 480px) {
+        .watr-blob { flex-direction: column-reverse; text-align: center; gap: 10px; }
+        .watr-blob .watr-row { justify-content: center; }
+        .watr-blob__face { width: 120px; }
+    }
+
+    /* quote: an in-joke with a fake-official attribution */
+    .watr-quote { margin: 0; }
+    .watr-quote cite {
+        display: block;
+        margin-top: 1em;
+        font-style: italic;
+        font-weight: 700;
+    }
+    .watr-quote cite::before { content: "- "; }
+
+    /* sidebar: slides in from the left, pushes nothing, casts the drop */
+    .watr-sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 4;
+        width: var(--watr-sidebar-w);
+        height: 100%;
+        overflow: hidden;
+        background-color: var(--watr-surface);
+        box-shadow: var(--watr-drop);
+    }
+    .watr-sidebar.is-hidden { width: 0; box-shadow: none; }
+
+    /* modal: dim the page, center the content */
+    .watr-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgb(0 0 0 / 0.4);
+    }
+
+    /* inline emoji images sit on the text baseline */
+    img.watr-emoji {
+        height: 20px;
+        width: 20px;
+        vertical-align: -5px;
+    }
+
+    .watr-center {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        flex: 1;
+        text-align: center;
+    }
+}
