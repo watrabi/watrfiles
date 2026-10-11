@@ -30,7 +30,7 @@
         /* neutrals lean a tiny bit toward the hue so every site feels its own */
         --watr-page:       #ffffff;
         --watr-surface:    oklch(95.8% 0.004 var(--watr-hue));
-        --watr-panel:      oklch(91% 0.004 var(--watr-hue));
+        --watr-panel:      oklch(96.5% calc(0.025 * var(--watr-chroma)) var(--watr-hue));  /* a pale wash of the hue */
         --watr-field:      oklch(90.7% 0.004 var(--watr-hue));
         --watr-field-over: oklch(79% 0.006 var(--watr-hue));
         --watr-text:       oklch(16% 0.012 var(--watr-hue));
@@ -60,7 +60,7 @@
         :root:not([data-theme="light"]), :root:not([data-theme="light"]) .watr-scope {
             --watr-page:       oklch(19% 0.012 var(--watr-hue));
             --watr-surface:    oklch(23% 0.014 var(--watr-hue));
-            --watr-panel:      oklch(26% 0.016 var(--watr-hue));
+            --watr-panel:      oklch(27% calc(0.03 * var(--watr-chroma)) var(--watr-hue));
             --watr-field:      oklch(30% 0.016 var(--watr-hue));
             --watr-field-over: oklch(37% 0.02 var(--watr-hue));
             --watr-text:       oklch(94% 0.008 var(--watr-hue));
@@ -72,7 +72,7 @@
     :root[data-theme="dark"], :root[data-theme="dark"] .watr-scope {
         --watr-page:       oklch(19% 0.012 var(--watr-hue));
         --watr-surface:    oklch(23% 0.014 var(--watr-hue));
-        --watr-panel:      oklch(26% 0.016 var(--watr-hue));
+        --watr-panel:      oklch(27% calc(0.03 * var(--watr-chroma)) var(--watr-hue));
         --watr-field:      oklch(30% 0.016 var(--watr-hue));
         --watr-field-over: oklch(37% 0.02 var(--watr-hue));
         --watr-text:       oklch(94% 0.008 var(--watr-hue));
@@ -508,7 +508,7 @@ body {
     .watr-tag--danger  { background-color: var(--watr-danger); color: #ffffff; }
     .watr-tag--warning { background-color: var(--watr-warning); color: var(--watr-ink); }
 
-    /* ---------- avatar: square picture, round status dot poking out the top-right ---------- */
+    /* ---------- avatar: square picture, status is a bar along the bottom edge ---------- */
     .watr-avatar {
         position: relative;
         display: inline-grid;
@@ -518,8 +518,9 @@ body {
         height: 48px;
         font-weight: 800;
         text-transform: lowercase;
-        background-color: var(--watr-bright);
-        color: var(--watr-ink);
+        overflow: hidden;
+        background-color: var(--watr-deep);
+        color: var(--watr-bright);
         background-size: cover;
         background-position: center;
     }
@@ -527,14 +528,10 @@ body {
     .watr-avatar--big { width: 120px; height: 120px; font-size: 2.5rem; }
     .watr-avatar__status {
         position: absolute;
-        right: 0;
-        top: 0;
-        width: 30%;
-        aspect-ratio: 1;
-        min-width: 10px;
-        border-radius: 50%;
-        border: 2px solid var(--watr-page);
-        transform: translate(40%, -40%);
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        height: max(4px, 12%);
         background-color: var(--watr-muted);
     }
     .watr-avatar__status--online { background-color: var(--watr-bright); }

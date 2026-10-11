@@ -11,7 +11,7 @@ This folder is self-contained. Copy it into any project.
 | `index.html` | live guide. open it in a browser, drag the knobs, copy the snippet, click around the mockup |
 | `assets/` | the blobs and the watrlabs icon |
 
-Version 0.2. Taken from watrfiles (`public/assets/base.css`, the login, 404 and 500 pages).
+Version 0.3. Taken from watrfiles (`public/assets/base.css`, the login, 404 and 500 pages).
 
 ---
 
@@ -99,7 +99,7 @@ The exception is the page itself: the `body` background, text color and font, pl
 | button | `.watr-btn` `--quiet` `--danger`, `:disabled` | works on `<a>` and `<button>` |
 | fields | plain `input`, `select`, `textarea` | styled by default, no class needed |
 | message | `.watr-msg` `--warning` `--info` | solid block, no icon, no border |
-| panel | `.watr-panel` | a raised block. use it for one thing per area, not every box |
+| panel | `.watr-panel` | a raised block with a pale wash of the site's hue. use it for one thing per area, not every box |
 | split | `.watr-split` `.watr-split__aside` `.watr-split__main` | the thick rule layout |
 | blob | `.watr-blob` `.watr-blob__face` | error and empty states |
 | quote | `.watr-quote` + `<cite>` | cite gets the `- ` prefix automatically |
@@ -109,7 +109,7 @@ The exception is the page itself: the `body` background, text color and font, pl
 | tabs | `.watr-tabs` + `.watr-tab` with `aria-selected` | tabs sit on a thick bright rule and the active one joins it |
 | dropdown | `<details class="watr-dropdown">` + `<summary class="watr-btn">` + `.watr-menu` | no JS needed. `--right` opens toward the left edge. `.is-danger` on the delete item |
 | tags | `.watr-tag` `--bright` `--deep` `--warning` `--danger` | small square lowercase labels |
-| avatar | `.watr-avatar` `--small` `--big` + `.watr-avatar__status` `--online` `--away` `--busy` | square picture (initials or a `background-image`), round dot poking out the top-right. online is the site's hue, not green |
+| avatar | `.watr-avatar` `--small` `--big` + `.watr-avatar__status` `--online` `--away` `--busy` | square picture (initials or a `background-image`). status is a bar along the bottom edge, never a dot: hue for online, yellow away, red busy, grey offline |
 | tooltip | `data-watr-tip="text"`, add `data-watr-tip-end` near the right edge | CSS only |
 | progress | `<progress class="watr-progress">` | flat track, bright fill |
 | loading | `.watr-loading` with three `<i>` | three squares taking turns. sits still for reduced motion |
@@ -182,7 +182,7 @@ Things I noticed while pulling this out of watrfiles. Decide on each and move it
 
 - [ ] **White on the bar color is only 3.2:1 contrast.** Fine for bold nav links, too low for small body text. Options: darken `--watr-bar` to around 55% lightness, or keep it and never put small text on bars. (Black on bright is 11:1, no problem there.)
 - [ ] **Yellow warnings had no text color** in the original CSS. The kit uses black text on yellow. Confirm that's the look.
-- [ ] **`.container` in `base.css` has a broken background** (`background-color: --container-color;` is missing `var()`), so it never actually got its grey. The kit's `.watr-panel` uses the grey. Decide if panels should be grey or white.
+- [x] **Panel color.** The old `.container` grey never applied in `base.css` (`background-color: --container-color;` is missing `var()`). Panels now use a pale wash of the hue instead of grey, so they change with each site.
 - [ ] **Toast position.** Bottom-right fits the light-from-top-left idea. On phones that's also where thumbs are. Check that it doesn't cover anything important on real pages.
 - [ ] **Tables on phones** just scroll sideways for now. Decide if some tables should turn into stacked cards instead.
 - [ ] **A display moment.** Montserrat at 900 weight could be a thing for big landing headings. Try it on one site first.
@@ -191,5 +191,6 @@ Things I noticed while pulling this out of watrfiles. Decide on each and move it
 
 ## changelog
 
+- **0.3** (2026-10): avatar status is a bar along the bottom instead of a dot. initials avatars are bright on deep. panels are a pale wash of the hue instead of flat grey.
 - **0.2** (2026-10): the bar no longer casts a shadow onto alert strips; the stack casts one shadow from its bottom. fixed the page background not changing in dark mode when a reset is loaded. added modals, toasts, tables, tabs, dropdowns, checks, switches, tags, avatars, tooltips, progress, loading, pagination, breadcrumbs, `watr.js`, and a full mockup page.
 - **0.1** (2026-10): first pull from watrfiles. ramp, drop shadow, bars, buttons, fields, split, blob, voice.
